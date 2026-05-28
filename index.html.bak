@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>SEVAKA — Your Intelligent HR Companion</title>
+  <meta name="viewport" content="width=1440">
+  <meta name="description" content="SEVAKA HRIS — platform HR terintegrasi untuk seluruh siklus karyawan. Rekrutmen, onboarding, absensi, penggajian, dan kinerja dalam satu ekosistem.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <style>
+    html, body { background: white; margin: 0; }
+    .site { width: 100%; max-width: 1440px; margin: 0 auto; }
+
+    /* ===== Shared brand mark ===== */
+    .brand        { display: flex; align-items: center; gap: 10px; }
+    .brand__s     { width: 36px; height: 36px; border-radius: 8px; background: var(--color-primary-500); color: white; display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; font-weight: 700; font-size: 22px; flex-shrink: 0; }
+    .brand__name  { font: 700 16px/1 Arial, sans-serif; color: var(--color-secondary-700); letter-spacing: 0.02em; }
+
+    /* ===== Top nav ===== */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; gap: 28px;
+      padding: 16px 48px;
+      background: rgba(255,255,255,.92); backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-1);
+    }
+    .nav__links { display: flex; gap: 28px; flex: 1; justify-content: center; }
+    .nav__links a {
+      font: 500 14px/1 var(--font-body); color: var(--fg-2);
+      text-decoration: none; padding: 6px 0; cursor: pointer;
+      transition: color var(--duration-2) var(--ease-standard);
+    }
+    .nav__links a:hover { color: var(--color-secondary-500); }
+    .nav__cta { display: flex; gap: 10px; align-items: center; }
+
+    /* ===== Button variants (website surface) ===== */
+    .btn-ghost-nav {
+      height: 40px; padding: 0 14px; border-radius: 999px;
+      background: transparent; color: var(--fg-1);
+      font: 700 13px/1 var(--font-body); border: none; cursor: pointer;
+      transition: color var(--duration-2) var(--ease-standard);
+    }
+    .btn-ghost-nav:hover { color: var(--color-secondary-500); }
+
+    .btn-primary-pill {
+      height: 40px; padding: 0 18px; border-radius: 999px;
+      background: var(--color-secondary-500); color: white;
+      font: 700 13px/1 var(--font-body); letter-spacing: 0.01em;
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: inset 0 0 2px 0 var(--color-secondary-700);
+      transition: background var(--duration-2) var(--ease-standard), box-shadow var(--duration-2) var(--ease-standard);
+    }
+    .btn-primary-pill:hover { background: var(--color-secondary-600); box-shadow: var(--shadow-press); }
+    .btn-primary-pill svg { width: 16px; height: 16px; }
+
+    .btn-light-pill {
+      height: 40px; padding: 0 18px; border-radius: 999px;
+      background: rgba(255,255,255,.16); color: white;
+      font: 700 13px/1 var(--font-body); letter-spacing: 0.01em;
+      border: 1px solid rgba(255,255,255,.4); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background var(--duration-2) var(--ease-standard);
+    }
+    .btn-light-pill:hover { background: rgba(255,255,255,.24); }
+    .btn-light-pill svg { width: 16px; height: 16px; }
+
+    /* ===== Hero ===== */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 48px 100px;
+      background: linear-gradient(180deg, var(--color-secondary-600) 0%, var(--color-secondary-900) 100%);
+      color: white;
+    }
+    .hero__rings {
+      position: absolute; left: -200px; bottom: -360px;
+      width: 720px; height: 720px; pointer-events: none;
+    }
+    .hero__rings::before, .hero__rings::after {
+      content: ""; position: absolute; inset: 0;
+      border-radius: 50%; border: 1px solid rgba(135,206,235,.35);
+    }
+    .hero__rings::after { transform: scale(0.78); border-color: rgba(135,206,235,.25); }
+    .hero__glow {
+      position: absolute; right: -200px; top: -200px;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(135,206,235,.35), transparent 60%);
+      pointer-events: none;
+    }
+    .hero__grid {
+      position: relative; display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px;
+      align-items: center; max-width: 1200px; margin: 0 auto;
+    }
+    .hero__eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px 6px 8px; border-radius: 999px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16);
+      font: 700 11px/1 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase;
+      color: white; margin-bottom: 22px;
+    }
+    .hero__eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary-500); }
+    .hero h1 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 56px; line-height: 1.05; letter-spacing: -0.02em;
+      margin: 0; color: white;
+    }
+    .hero h1 em { font-style: normal; color: var(--color-primary-500); }
+    .hero .lede {
+      font: 500 18px/1.5 var(--font-body); color: rgba(255,255,255,.82);
+      margin: 22px 0 30px; max-width: 540px;
+    }
+    .hero__cta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero__trust {
+      margin-top: 36px; display: flex; gap: 28px; align-items: center;
+      font: 500 12px/1.4 var(--font-body); color: rgba(255,255,255,.6);
+    }
+    .hero__trust b { color: white; font-weight: 700; }
+    .hero__trust-divider { width: 1px; height: 24px; background: rgba(255,255,255,.18); }
+
+    /* Hero product mock */
+    .hero__mock {
+      position: relative; aspect-ratio: 4/3; border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 30px 60px rgba(2,30,90,.6);
+      padding: 18px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .hero__mock-bar { display: flex; gap: 6px; }
+    .hero__mock-bar span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.3); }
+    .hero__mock-body {
+      flex: 1; background: white; border-radius: 12px; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px; color: var(--fg-1);
+    }
+    .hero__mock-head { font: 700 14px/1.2 var(--font-display); color: var(--fg-1); }
+    .hero__mock-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .hero__mock-stat {
+      background: var(--color-mist); border-radius: 8px; padding: 8px 10px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .hero__mock-stat small { font: 700 9px/1 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-3); }
+    .hero__mock-stat b { font: 700 20px/1 var(--font-display); color: var(--fg-1); letter-spacing: -0.02em; }
+    .hero__mock-stat span { font: 700 10px/1 var(--font-body); color: var(--color-success-900); }
+
+    /* ===== Logo strip ===== */
+    .strip {
+      padding: 32px 48px; background: var(--color-mist);
+      display: flex; align-items: center; justify-content: center; gap: 60px;
+      flex-wrap: wrap;
+    }
+    .strip__label { font: 700 11px/1 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-3); }
+    .strip__logos { display: flex; gap: 40px; align-items: center; opacity: .6; flex-wrap: wrap; justify-content: center; }
+    .strip__logo { font: 700 18px/1 var(--font-body); color: var(--fg-3); letter-spacing: 0.06em; }
+
+    /* ===== Products section ===== */
+    section.products { padding: 100px 48px 80px; background: white; }
+    section.products h2 {
+      font-family: var(--font-display); font-weight: 700; font-size: 40px;
+      line-height: 1.1; letter-spacing: -0.02em; text-align: center; margin: 0 auto; max-width: 720px;
+    }
+    .products__sub { font: 500 16px/1.5 var(--font-body); color: var(--fg-3); text-align: center; max-width: 600px; margin: 16px auto 60px; }
+    .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1200px; margin: 0 auto; }
+    .product {
+      background: white; border: 1px solid var(--border-1); border-radius: 16px;
+      padding: 28px 22px; display: flex; flex-direction: column; gap: 14px;
+      box-shadow: var(--shadow-card-sm);
+      transition: box-shadow var(--duration-2) var(--ease-standard), transform var(--duration-2) var(--ease-standard);
+    }
+    .product:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
+    .product__icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--color-primary-100); color: var(--color-secondary-700);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .product.is-soon .product__icon { background: var(--color-vapor); color: var(--fg-4); }
+    .product__icon svg { width: 24px; height: 24px; }
+    .product__name {
+      font: 700 18px/1.2 var(--font-display); color: var(--fg-1); letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .badge-soon {
+      display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px;
+      font: 700 9px/1 var(--font-body); letter-spacing: 0.04em;
+      background: var(--color-warning-100); color: var(--color-warning-800);
+    }
+    .product__desc { font: 500 13px/1.5 var(--font-body); color: var(--fg-3); flex: 1; }
+    .product__cta {
+      font: 700 12px/1 var(--font-body); color: var(--color-secondary-500);
+      cursor: pointer; text-decoration: none;
+    }
+    .product__cta:hover { color: var(--color-secondary-700); text-decoration: underline; }
+
+    /* ===== Why SEVAKA ===== */
+    section.why { padding: 100px 48px; background: var(--color-mist); }
+    .why-head {
+      max-width: 1200px; margin: 0 auto 60px;
+      display: grid; grid-template-columns: 1fr 1.5fr; gap: 60px; align-items: end;
+    }
+    .why-head .eyebrow-line {
+      font: 700 11px/1 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--color-secondary-500);
+    }
+    .why-head h2 {
+      font-family: var(--font-display); font-weight: 700; font-size: 40px;
+      line-height: 1.1; letter-spacing: -0.02em; margin: 14px 0 0;
+    }
+    .why-head p { font: 500 16px/1.6 var(--font-body); color: var(--fg-2); margin: 0; }
+    .why-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .cap {
+      background: white; border-radius: 14px; padding: 24px;
+      border: 1px solid var(--border-1); display: flex; flex-direction: column; gap: 14px;
+    }
+    .cap__icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: var(--color-secondary-500); color: white;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cap__icon svg { width: 20px; height: 20px; }
+    .cap__name { font: 700 16px/1.2 var(--font-display); color: var(--fg-1); }
+    .cap__desc { font: 500 13px/1.5 var(--font-body); color: var(--fg-3); }
+
+    /* ===== Testimonial ===== */
+    section.testimonial { padding: 100px 48px; background: white; }
+    .test__inner { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: center; }
+    .test__photo {
+      aspect-ratio: 1; border-radius: 16px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.6), transparent 50%),
+                  linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-700));
+      position: relative; overflow: hidden;
+    }
+    .test__photo::after {
+      content: "TH"; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font: 700 96px/1 var(--font-display); color: rgba(255,255,255,.45); letter-spacing: -0.04em;
+    }
+    .test__quote {
+      font-family: var(--font-display); font-weight: 500; font-size: 28px; line-height: 1.35;
+      letter-spacing: -0.01em; color: var(--fg-1); margin: 0;
+    }
+    .test__quote::before {
+      content: "\201C"; color: var(--color-secondary-500);
+      font-size: 56px; line-height: 0; vertical-align: -22px; margin-right: 8px;
+    }
+    .test__attr { margin-top: 20px; font: 500 14px/1.4 var(--font-body); color: var(--fg-3); }
+    .test__attr b { color: var(--fg-1); font-weight: 700; display: block; }
+
+    /* ===== CTA banner ===== */
+    section.cta-banner {
+      padding: 80px 48px; text-align: center;
+      background: linear-gradient(180deg, var(--color-secondary-700) 0%, var(--color-secondary-900) 100%);
+      color: white; position: relative; overflow: hidden;
+    }
+    .cta-banner::before, .cta-banner::after {
+      content: ""; position: absolute; border-radius: 50%;
+      border: 1px solid rgba(135,206,235,.25); pointer-events: none;
+    }
+    .cta-banner::before { width: 600px; height: 600px; left: -200px; top: -200px; }
+    .cta-banner::after { width: 800px; height: 800px; right: -300px; bottom: -400px; border-color: rgba(135,206,235,.18); }
+    .cta-banner h2 {
+      position: relative; max-width: 720px; margin: 0 auto;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 40px; line-height: 1.15; letter-spacing: -0.02em;
+    }
+    .cta-banner p { position: relative; max-width: 540px; margin: 16px auto 30px; font: 500 16px/1.5 var(--font-body); color: rgba(255,255,255,.8); }
+    .cta-banner__btns { position: relative; display: flex; justify-content: center; gap: 12px; }
+    .btn-on-dark {
+      height: 44px; padding: 0 22px; border-radius: 999px;
+      background: white; color: var(--color-secondary-700);
+      font: 700 14px/1 var(--font-body); border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background var(--duration-2) var(--ease-standard);
+    }
+    .btn-on-dark:hover { background: var(--color-mist); }
+    .btn-on-dark svg { width: 16px; height: 16px; }
+
+    /* ===== Footer ===== */
+    footer { background: var(--color-obsidian); color: var(--color-fog); padding: 56px 48px 32px; }
+    .footer__grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 36px;
+      padding-bottom: 36px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .footer__brand { display: flex; flex-direction: column; gap: 14px; }
+    .footer__brand p { font: 500 13px/1.5 var(--font-body); color: rgba(255,255,255,.55); margin: 0; max-width: 280px; }
+    .footer__col h4 {
+      font: 700 11px/1 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--color-primary-500); margin: 4px 0 18px;
+    }
+    .footer__col a {
+      display: block; font: 500 13px/1 var(--font-body); color: rgba(255,255,255,.7);
+      margin-bottom: 12px; text-decoration: none;
+      transition: color var(--duration-2) var(--ease-standard);
+    }
+    .footer__col a:hover { color: white; }
+    .footer__bottom {
+      max-width: 1200px; margin: 24px auto 0;
+      display: flex; align-items: center; justify-content: space-between;
+      font: 500 12px/1 var(--font-body); color: rgba(255,255,255,.4);
+    }
+    .footer__bottom select {
+      background: transparent; border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+      color: rgba(255,255,255,.7); padding: 6px 12px; font: 500 12px/1 var(--font-body);
+    }
+
+    /* ===== Login page ===== */
+    .auth-page { display: none; grid-template-columns: 1.3fr 1fr; min-height: 100vh; }
+    .auth-page__left {
+      position: relative; overflow: hidden;
+      background: linear-gradient(180deg, var(--color-secondary-600) 0%, var(--color-secondary-900) 100%);
+      color: white; padding: 80px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .auth-page__left::before {
+      content: ""; position: absolute; bottom: -280px; left: 80px;
+      width: 560px; height: 560px; border-radius: 50%;
+      border: 1px solid rgba(135,206,235,.35); pointer-events: none;
+    }
+    .auth-page__left::after {
+      content: ""; position: absolute; bottom: -360px; left: -120px;
+      width: 560px; height: 560px; border-radius: 50%;
+      border: 1px solid rgba(135,206,235,.25); pointer-events: none;
+    }
+    .auth-brand .brand__s  { width: 56px; height: 56px; font-size: 32px; }
+    .auth-brand .brand__name { font-size: 22px; color: white; }
+    .auth-hero h2 {
+      font-family: var(--font-display); font-weight: 700; font-size: 44px;
+      line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 14px; color: white;
+    }
+    .auth-hero p { font: 500 16px/1.5 var(--font-body); color: rgba(255,255,255,.8); margin: 0 0 26px; }
+    .auth-page__right {
+      display: flex; align-items: center; justify-content: center;
+      padding: 60px; background: white;
+    }
+    .auth-form {
+      width: 380px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .auth-form h3 {
+      font-family: var(--font-display); font-weight: 700; font-size: 28px;
+      line-height: 1.15; letter-spacing: -0.02em; margin: 0; color: var(--fg-1);
+    }
+    .auth-form .sub-text { font: 500 13px/1.5 var(--font-body); color: var(--fg-3); margin: 0; }
+    .auth-form .field { display: flex; flex-direction: column; gap: 6px; }
+    .auth-form .field label { font: 500 13px/1 var(--font-body); color: var(--fg-2); }
+    .auth-form .field input {
+      height: 44px; border-radius: 8px; background: var(--color-cloud);
+      box-shadow: var(--shadow-inset-rim); padding: 0 14px;
+      font: 500 14px/1 var(--font-body); color: var(--fg-1);
+      border: none; outline: none; width: 100%;
+      transition: box-shadow var(--duration-2) var(--ease-standard);
+    }
+    .auth-form .field input:focus {
+      box-shadow: inset 0 0 0 1px var(--color-secondary-500), 0 0 0 4px rgba(2,132,199,.16);
+    }
+    .auth-form .row-inline {
+      display: flex; align-items: center; justify-content: space-between;
+      font: 500 13px/1 var(--font-body); color: var(--fg-2);
+    }
+    .auth-form .row-inline a { color: var(--color-secondary-500); font-weight: 600; text-decoration: none; }
+    .auth-form .row-inline a:hover { text-decoration: underline; }
+    .auth-form .checkbox-mini { display: flex; align-items: center; gap: 6px; cursor: pointer; font: 500 13px/1 var(--font-body); }
+    .auth-form .checkbox-mini input { display: none; }
+    .auth-form .checkbox-mini .box {
+      width: 16px; height: 16px; border-radius: 4px; background: white;
+      box-shadow: inset 0 0 0 1.5px var(--color-silver);
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .auth-form .checkbox-mini input:checked + .box { background: var(--color-secondary-500); box-shadow: none; }
+    .auth-form .checkbox-mini input:checked + .box::after {
+      content: ""; width: 8px; height: 5px;
+      border: 2px solid white; border-top: none; border-right: none;
+      transform: rotate(-45deg); margin-top: -2px;
+    }
+    .auth-form .btn-submit {
+      height: 44px; border-radius: 999px; background: var(--color-secondary-500); color: white;
+      font: 700 14px/1 var(--font-body); letter-spacing: 0.01em;
+      border: none; cursor: pointer; width: 100%;
+      box-shadow: inset 0 0 2px 0 var(--color-secondary-700);
+      transition: background var(--duration-2) var(--ease-standard), box-shadow var(--duration-2) var(--ease-standard);
+    }
+    .auth-form .btn-submit:hover { background: var(--color-secondary-600); box-shadow: var(--shadow-press); }
+    .auth-form .alt { text-align: center; font: 500 13px/1.4 var(--font-body); color: var(--fg-3); }
+    .auth-form .alt a { color: var(--color-secondary-500); font-weight: 700; text-decoration: none; }
+
+    /* Page visibility */
+    .marketing-page { display: block; }
+    body[data-view="login"] .marketing-page { display: none; }
+    body[data-view="login"] .auth-page { display: grid; }
+  </style>
+</head>
+<body data-view="home">
+
+<!-- ==================== MARKETING HOME ==================== -->
+<div class="marketing-page site">
+
+  <!-- Top nav -->
+  <header class="nav">
+    <div class="brand">
+      <div class="brand__s">S</div>
+      <div class="brand__name">SEVAKA</div>
+    </div>
+    <nav class="nav__links">
+      <a>Produk</a>
+      <a>Solusi</a>
+      <a>Harga</a>
+      <a>Pelanggan</a>
+      <a>Sumber Daya</a>
+      <a>Perusahaan</a>
+    </nav>
+    <div class="nav__cta">
+      <button class="btn-ghost-nav" onclick="document.body.dataset.view='login'">Login</button>
+      <button class="btn-primary-pill">
+        Request Demo <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="hero__rings"></div>
+    <div class="hero__grid">
+      <div>
+        <span class="hero__eyebrow">
+          <span class="dot"></span>BARU · Wawasan berbasis AI
+        </span>
+        <h1>Pendamping HR<br><em>Cerdas</em> Anda.</h1>
+        <p class="lede">
+          SEVAKA menyatukan seluruh siklus karyawan — rekrutmen, onboarding, absensi, penggajian,
+          dan kinerja — dalam satu ekosistem terhubung. Data real-time, wawasan AI, dibangun untuk
+          organisasi Indonesia dari berbagai skala.
+        </p>
+        <div class="hero__cta">
+          <button class="btn-primary-pill" style="background:white;color:var(--color-secondary-700);box-shadow:none">
+            Request Demo <i data-lucide="arrow-right"></i>
+          </button>
+          <button class="btn-light-pill">
+            <i data-lucide="play-circle"></i>Tonton Tur 2 Menit
+          </button>
+        </div>
+        <div class="hero__trust">
+          <div><b>1.400+</b> organisasi mempercayai SEVAKA</div>
+          <div class="hero__trust-divider"></div>
+          <div><b>200rb+</b> karyawan dikelola setiap hari</div>
+          <div class="hero__trust-divider"></div>
+          <div><b>4.8/5</b> di G2 &amp; Capterra</div>
+        </div>
+      </div>
+
+      <!-- Product mock -->
+      <div class="hero__mock" aria-hidden="true">
+        <div class="hero__mock-bar">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="hero__mock-body">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="hero__mock-head">Minggu ini</span>
+            <span style="font:700 9px/1 var(--font-body);letter-spacing:.04em;text-transform:uppercase;color:var(--color-success-900);background:var(--color-success-100);padding:3px 8px;border-radius:999px">ON TRACK</span>
+          </div>
+          <div class="hero__mock-stats">
+            <div class="hero__mock-stat">
+              <small>Hadir</small>
+              <b>1.232</b>
+              <span>▲ 1,2%</span>
+            </div>
+            <div class="hero__mock-stat">
+              <small>Cuti</small>
+              <b>14</b>
+              <span style="color:var(--color-warning-800)">▼ 2</span>
+            </div>
+            <div class="hero__mock-stat">
+              <small>Tertunda</small>
+              <b>37</b>
+              <span style="color:var(--fg-3)">Stabil</span>
+            </div>
+          </div>
+          <svg viewBox="0 0 280 90" preserveAspectRatio="none" style="width:100%;height:90px" aria-hidden="true">
+            <defs>
+              <linearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0284c7" stop-opacity=".30"/>
+                <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <g stroke="#f1f5f9" stroke-width="1">
+              <line x1="0" y1="22" x2="280" y2="22"/>
+              <line x1="0" y1="44" x2="280" y2="44"/>
+              <line x1="0" y1="66" x2="280" y2="66"/>
+            </g>
+            <path d="M 10 54 L 50 45 L 90 58 L 130 36 L 170 49 L 210 22 L 260 40 L 260 90 L 10 90 Z" fill="url(#heroGrad)"/>
+            <path d="M 10 54 L 50 45 L 90 58 L 130 36 L 170 49 L 210 22 L 260 40" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logo strip -->
+  <div class="strip">
+    <span class="strip__label">Dipercaya oleh</span>
+    <div class="strip__logos">
+      <span class="strip__logo">PERTAMINA</span>
+      <span class="strip__logo">TELKOM</span>
+      <span class="strip__logo">BCA</span>
+      <span class="strip__logo">MANDIRI</span>
+      <span class="strip__logo">TOKOPEDIA</span>
+      <span class="strip__logo">GOJEK</span>
+    </div>
+  </div>
+
+  <!-- Products section -->
+  <section class="products">
+    <h2>Satu Platform, Seluruh Kebutuhan HR</h2>
+    <p class="products__sub">
+      Dari rekrutmen hingga kinerja, SEVAKA menyatukan setiap aspek HR dalam satu ekosistem terhubung
+      yang mudah digunakan oleh tim HR maupun karyawan.
+    </p>
+    <div class="product-grid">
+      <div class="product">
+        <div class="product__icon"><i data-lucide="layout-dashboard"></i></div>
+        <div class="product__name">HRIS</div>
+        <p class="product__desc">Manajemen karyawan lengkap — absensi, cuti, penggajian, dan administrasi personel dalam satu tampilan.</p>
+        <a class="product__cta" href="app.html">Buka aplikasi →</a>
+      </div>
+      <div class="product">
+        <div class="product__icon"><i data-lucide="briefcase"></i></div>
+        <div class="product__name">Rekrutmen</div>
+        <p class="product__desc">ATS terintegrasi dengan pipeline kandidat, penjadwalan wawancara, dan alur onboarding otomatis.</p>
+        <a class="product__cta">Pelajari lebih lanjut →</a>
+      </div>
+      <div class="product is-soon">
+        <div class="product__icon"><i data-lucide="line-chart"></i></div>
+        <div class="product__name">Insights <span class="badge-soon">SOON</span></div>
+        <p class="product__desc">Analitik tenaga kerja berbasis AI — prediksi turnover, benchmark kompensasi, tren produktivitas.</p>
+        <a class="product__cta" style="color:var(--fg-4);cursor:default">Segera hadir</a>
+      </div>
+      <div class="product is-soon">
+        <div class="product__icon"><i data-lucide="award"></i></div>
+        <div class="product__name">Manajemen Kinerja <span class="badge-soon">SOON</span></div>
+        <p class="product__desc">Review kinerja, penetapan OKR, dan kalibrasi talent dalam satu platform yang adil dan transparan.</p>
+        <a class="product__cta" style="color:var(--fg-4);cursor:default">Segera hadir</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why SEVAKA -->
+  <section class="why">
+    <div class="why-head">
+      <div>
+        <div class="eyebrow-line">Kenapa SEVAKA</div>
+        <h2>Dibangun untuk Organisasi Indonesia</h2>
+      </div>
+      <p>
+        SEVAKA dirancang dari awal untuk memenuhi kebutuhan spesifik regulasi, budaya kerja, dan skala bisnis Indonesia —
+        bukan sekadar adaptasi produk asing. Mulai dari perhitungan BPJS, PPh 21, hingga integrasi Bank Indonesia.
+      </p>
+    </div>
+    <div class="why-grid">
+      <div class="cap">
+        <div class="cap__icon"><i data-lucide="zap"></i></div>
+        <div class="cap__name">Otomasi Alur Kerja HR</div>
+        <p class="cap__desc">Eliminasi tugas manual berulang. Dari onboarding karyawan baru hingga perhitungan lembur, SEVAKA mengotomasi proses end-to-end.</p>
+      </div>
+      <div class="cap">
+        <div class="cap__icon"><i data-lucide="bar-chart-2"></i></div>
+        <div class="cap__name">Data HR Real-Time</div>
+        <p class="cap__desc">Dashboard eksekutif dengan data kehadiran, turnover, dan kinerja yang diperbarui secara real-time, tersedia di mana saja.</p>
+      </div>
+      <div class="cap">
+        <div class="cap__icon"><i data-lucide="lightbulb"></i></div>
+        <div class="cap__name">Wawasan Berbasis AI</div>
+        <p class="cap__desc">Rekomendasi cerdas untuk keputusan tenaga kerja — identifikasi risiko flight risk, optimasi jadwal, dan analisis biaya SDM.</p>
+      </div>
+      <div class="cap">
+        <div class="cap__icon"><i data-lucide="shield"></i></div>
+        <div class="cap__name">Kepatuhan Regulasi</div>
+        <p class="cap__desc">Perhitungan otomatis BPJS Ketenagakerjaan, BPJS Kesehatan, PPh 21, dan THR sesuai peraturan terkini Ketenagakerjaan RI.</p>
+      </div>
+      <div class="cap">
+        <div class="cap__icon"><i data-lucide="users"></i></div>
+        <div class="cap__name">Portal Karyawan Self-Service</div>
+        <p class="cap__desc">Karyawan dapat mengakses slip gaji, mengajukan cuti, memperbarui data pribadi, dan melihat jadwal shift secara mandiri.</p>
+      </div>
+      <div class="cap">
+        <div class="cap__icon"><i data-lucide="puzzle"></i></div>
+        <div class="cap__name">Integrasi Fleksibel</div>
+        <p class="cap__desc">Terhubung dengan sistem payroll, akuntansi, dan ERP yang sudah ada. API terbuka untuk kebutuhan kustomisasi enterprise.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="testimonial">
+    <div class="test__inner">
+      <div class="test__photo" aria-hidden="true"></div>
+      <div>
+        <blockquote class="test__quote">
+          SEVAKA mengubah cara kami mengelola 3.000+ karyawan di 12 lokasi. Apa yang dulu membutuhkan
+          seminggu kini selesai dalam hitungan menit.
+        </blockquote>
+        <div class="test__attr">
+          <b>Theodorus F. Kiatra</b>
+          Chief People Officer · PT Nusantara Digital
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA banner -->
+  <section class="cta-banner">
+    <h2>Siap Mentransformasi HR Perusahaan Anda?</h2>
+    <p>Bergabunglah dengan lebih dari 1.400 organisasi yang telah mempercayakan pengelolaan HR mereka kepada SEVAKA.</p>
+    <div class="cta-banner__btns">
+      <button class="btn-on-dark">
+        Request Demo <i data-lucide="arrow-right"></i>
+      </button>
+      <button class="btn-on-dark" style="background:transparent;color:white;border:1px solid rgba(255,255,255,.3)">
+        Lihat Harga
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="brand">
+          <div class="brand__s">S</div>
+          <div class="brand__name" style="color:white">SEVAKA</div>
+        </div>
+        <p>Platform HR terintegrasi untuk organisasi Indonesia. Dari rekrutmen hingga pensiun, dalam satu ekosistem cerdas.</p>
+      </div>
+      <div class="footer__col">
+        <h4>Produk</h4>
+        <a href="app.html">HRIS</a>
+        <a>Rekrutmen</a>
+        <a>Insights <span style="font-size:10px;opacity:.6">Segera</span></a>
+        <a>Manajemen Kinerja <span style="font-size:10px;opacity:.6">Segera</span></a>
+      </div>
+      <div class="footer__col">
+        <h4>Solusi</h4>
+        <a>Startup</a>
+        <a>UKM</a>
+        <a>Korporasi</a>
+        <a>Instansi Pemerintah</a>
+      </div>
+      <div class="footer__col">
+        <h4>Sumber Daya</h4>
+        <a>Dokumentasi</a>
+        <a>Blog</a>
+        <a>Webinar</a>
+        <a>Status Sistem</a>
+      </div>
+      <div class="footer__col">
+        <h4>Perusahaan</h4>
+        <a>Tentang Kami</a>
+        <a>Karir</a>
+        <a>Pers</a>
+        <a>Hubungi Kami</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 SEVAKA Technologies. Hak Cipta Dilindungi Undang-Undang.</span>
+      <div style="display:flex;gap:20px;align-items:center">
+        <a href="#" style="color:rgba(255,255,255,.4);text-decoration:none;font:500 12px/1 var(--font-body)">Kebijakan Privasi</a>
+        <a href="#" style="color:rgba(255,255,255,.4);text-decoration:none;font:500 12px/1 var(--font-body)">Syarat Penggunaan</a>
+        <select aria-label="Pilih bahasa">
+          <option>Bahasa Indonesia</option>
+          <option>English</option>
+        </select>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div class="auth-page">
+  <div class="auth-page__left">
+    <div class="brand auth-brand">
+      <div class="brand__s" style="width:56px;height:56px;font-size:32px">S</div>
+      <div class="brand__name" style="font-size:22px;color:white">SEVAKA</div>
+    </div>
+
+    <div class="auth-hero" style="position:relative;max-width:480px">
+      <h2>Selamat Datang Kembali</h2>
+      <p>Masuk ke SEVAKA HRIS untuk mengelola HR perusahaan Anda. Gunakan akun karyawan atau admin HR Anda.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn-primary-pill" style="background:white;color:var(--color-secondary-700);box-shadow:none">
+          HRIS Login
+        </button>
+        <button class="btn-light-pill" style="height:40px">
+          HRCM Login
+        </button>
+      </div>
+    </div>
+
+    <div style="font:500 12px/1.6 var(--font-body);color:rgba(255,255,255,.5)">
+      Butuh demo atau akun baru?<br>
+      <a href="#" style="color:var(--color-primary-400,#87ceeb);font-weight:600;text-decoration:none">Hubungi tim penjualan kami →</a>
+    </div>
+  </div>
+
+  <div class="auth-page__right">
+    <div class="auth-form">
+      <div>
+        <h3>Masuk ke SEVAKA</h3>
+        <p class="sub-text">Masukkan username perusahaan dan ID karyawan Anda.</p>
+      </div>
+
+      <form onsubmit="event.preventDefault(); window.open('app.html','_self');">
+        <div class="field">
+          <label>Username Perusahaan</label>
+          <input type="text" placeholder="contoh: perusahaan.id" autocomplete="organization">
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Employee ID</label>
+          <input type="text" placeholder="EMP-XXXX" autocomplete="username">
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Password</label>
+          <input type="password" placeholder="Masukkan password Anda" autocomplete="current-password">
+        </div>
+
+        <div class="row-inline" style="margin-top:12px">
+          <label class="checkbox-mini">
+            <input type="checkbox" checked>
+            <span class="box"></span>
+            Ingat saya
+          </label>
+          <a href="#">Lupa password?</a>
+        </div>
+
+        <button class="btn-submit" type="submit" style="margin-top:16px">Masuk</button>
+      </form>
+
+      <p class="alt">
+        Kembali ke <a href="#" onclick="document.body.dataset.view='home'; return false;">halaman utama</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.lucide) lucide.createIcons({ attrs: { 'stroke-width': 1.75 } });
+  });
+</script>
+</body>
+</html>

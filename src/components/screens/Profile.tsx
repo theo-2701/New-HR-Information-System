@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
-
-const TABS = ['Data Personal', 'Kepegawaian', 'Identitas & Alamat', 'Info Penggajian', 'Bank', 'BPJS', 'Pajak']
+import { useT } from '@/i18n'
 
 export default function Profile() {
-  const [tab, setTab] = useState('Data Personal')
+  const t = useT()
+  const p = t.profile
+  const [tab, setTab] = useState(p.tabs.personal)
+
+  const TABS = [
+    p.tabs.personal, p.tabs.employment, p.tabs.identity,
+    p.tabs.payroll, p.tabs.bank, p.tabs.bpjs, p.tabs.tax,
+  ]
 
   useEffect(() => {
     if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } })
@@ -21,26 +27,26 @@ export default function Profile() {
               <div style={{ font: '700 18px/1.2 var(--font-display)', color: 'var(--fg-1)' }}>Tessa Hartanto</div>
               <div style={{ font: '500 12px/1.4 var(--font-body)', color: 'var(--fg-3)' }}>Senior Designer · People Operations</div>
             </div>
-            <span className="chip chip--ok">Aktif</span>
+            <span className="chip chip--ok">{p.values.active}</span>
           </div>
 
           <div className="stack-3" style={{ borderTop: '1px solid var(--border-1)', paddingTop: '14px' }}>
             {[
-              ['Employee ID', 'EMP-2041'],
-              ['Email', 'tessa.h@perusahaan.id'],
-              ['Telepon', '+62 812‑4471‑0099'],
-              ['Manajer', 'R. Wirajaya'],
-              ['Bergabung', '12 Jan 2023'],
+              [p.fields.employeeId, 'EMP-2041'],
+              [p.fields.email,      'tessa.h@sevaka.id'],
+              [p.fields.phone,      '+62 812‑4471‑0099'],
+              [p.fields.manager,    'R. Wirajaya'],
+              [p.fields.joinDate,   '12 Jan 2023'],
             ].map(([k, v]) => (
               <div key={k} className="between" style={{ font: '500 12px/1.4 var(--font-body)' }}>
                 <span className="muted">{k}</span>
-                <span style={k === 'Email' ? { fontSize: '11px' } : {}}>{v}</span>
+                <span style={k === p.fields.email ? { fontSize: '11px' } : {}}>{v}</span>
               </div>
             ))}
           </div>
 
           <button className="btn btn--secondary" style={{ width: '100%', justifyContent: 'center' }}>
-            <i data-lucide="pencil"></i>Edit Profil
+            <i data-lucide="pencil"></i>{p.editProfile}
           </button>
         </div>
 
@@ -53,20 +59,20 @@ export default function Profile() {
           </div>
 
           <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' }}>
-            <Field label="Nama Lengkap"      value="Tessa Hartanto" />
-            <Field label="Nama Panggilan"    value="Tessa" />
-            <Field label="Tanggal Lahir"     value="04 / 08 / 1995" />
-            <Field label="Jenis Kelamin"     value="Perempuan" />
-            <Field label="Status Pernikahan" value="Belum Menikah" />
-            <Field label="Agama"             value="Islam" />
-            <Field label="Email"             value="tessa.h@perusahaan.id" type="email" help="Your email address is your identity on SEVAKA." />
-            <Field label="No. Telepon"       value="+62 812-4471-0099" type="tel" />
-            <Field label="Alamat Tinggal"    value="Jl. Gatot Subroto Kav. 27, Jakarta Selatan 12950" span={2} />
+            <Field label={p.fields.fullName}      value="Tessa Hartanto" />
+            <Field label={p.fields.nickname}      value="Tessa" />
+            <Field label={p.fields.birthDate}     value="04 / 08 / 1995" />
+            <Field label={p.fields.gender}        value={p.values.female} />
+            <Field label={p.fields.maritalStatus} value={p.values.single} />
+            <Field label={p.fields.religion}      value={p.values.islam} />
+            <Field label={p.fields.email}         value="tessa.h@sevaka.id" type="email" help={p.emailHelp} />
+            <Field label={p.fields.phone}         value="+62 812-4471-0099" type="tel" />
+            <Field label={p.fields.address}       value="Jl. Gatot Subroto Kav. 27, South Jakarta 12950" span={2} />
           </div>
 
           <div style={{ padding: '14px 24px', borderTop: '1px solid var(--border-1)', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-            <button className="btn btn--secondary">Batal</button>
-            <button className="btn btn--primary">Simpan Perubahan</button>
+            <button className="btn btn--secondary">{p.cancel}</button>
+            <button className="btn btn--primary">{p.saveChanges}</button>
           </div>
         </div>
       </div>
@@ -74,7 +80,15 @@ export default function Profile() {
   )
 }
 
-function Field({ label, value, type = 'text', help, span }) {
+interface FieldProps {
+  label: string
+  value: string
+  type?: string
+  help?: string
+  span?: number
+}
+
+function Field({ label, value, type = 'text', help, span }: FieldProps) {
   return (
     <div className="field" style={span ? { gridColumn: `span ${span}` } : {}}>
       <label className="field__label">{label}</label>

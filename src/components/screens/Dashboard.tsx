@@ -1,20 +1,39 @@
 import { useState, useEffect, useRef } from 'react'
 import bannerImg from '../../assets/banner.png'
+import { useT } from '@/i18n'
 
 const TODAY = new Date()
 const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const dateStr = `${DAYS[TODAY.getDay()]}, ${TODAY.getDate()} ${MONTHS[TODAY.getMonth()]} ${TODAY.getFullYear()}`
 
-export default function Dashboard({ goTo }) {
+const CONTRACT_ROWS = [
+  { name: 'Elena Kusuma',   status: 'Active',    endDate: '15/03/2026', duration: '12 Months' },
+  { name: 'Felix Hartawan', status: 'Active',    endDate: '30/06/2026', duration: '6 Months'  },
+  { name: 'Grace Tanaka',   status: 'Probation', endDate: '15/12/2025', duration: '3 Months'  },
+]
+
+const WHOS_OFF = [
+  { name: 'Lia Permata',    color: '#7fc1de', textColor: '#0e3f60' },
+  { name: 'Bagas Pratama',  color: '#fde68a', textColor: '#7a4f00' },
+  { name: 'Made Aditya',    color: '#0284c7', textColor: '#ffffff' },
+]
+
+interface DashboardProps {
+  goTo: (screen: string) => void
+}
+
+export default function Dashboard({ goTo: _goTo }: DashboardProps) {
+  const t = useT()
+  const d = t.dashboard
   const [moreOpen, setMoreOpen]   = useState(false)
-  const [tableTab, setTableTab]   = useState('Contract & Probation')
   const [activeDot, setActiveDot] = useState(0)
-  const moreRef = useRef(null)
+  const [tableTab, setTableTab]   = useState(d.contractProbation)
+  const moreRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    function onDoc(e) {
-      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false)
+    function onDoc(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false)
     }
     document.addEventListener('click', onDoc)
     return () => document.removeEventListener('click', onDoc)
@@ -31,23 +50,23 @@ export default function Dashboard({ goTo }) {
       <section className="dash-hero">
         <div className="dash-hero__copy">
           <div>
-            <h1 className="dash-hero__title">Selamat Datang,<br/><span>Tessa!</span></h1>
+            <h1 className="dash-hero__title">{d.welcome}<br/><span>Tessa!</span></h1>
             <span className="dash-hero__date">{dateStr}</span>
           </div>
           <div className="dash-hero__pills">
-            <button className="hero-pill"><span>Live Attendance</span></button>
-            <button className="hero-pill"><span>Request Time Off</span></button>
+            <button className="hero-pill"><span>{d.liveAttendance}</span></button>
+            <button className="hero-pill"><span>{d.requestTimeOff}</span></button>
             <div className="pos-rel" ref={moreRef}>
               <button className="hero-pill" onClick={e => { e.stopPropagation(); setMoreOpen(o => !o) }}>
-                <span>More Request</span>
+                <span>{d.moreRequest}</span>
                 <i data-lucide="chevron-down"></i>
               </button>
               <div className={`menu${moreOpen ? ' is-open' : ''}`} style={{ top: 'calc(100% + 8px)', left: 0, right: 'auto', minWidth: '220px' }}>
-                <button className="menu__item"><i data-lucide="file-text"></i>Reimbursement</button>
-                <button className="menu__item"><i data-lucide="briefcase"></i>Business trip</button>
-                <button className="menu__item"><i data-lucide="calendar-plus"></i>Overtime</button>
-                <button className="menu__item"><i data-lucide="clock"></i>Shift change</button>
-                <button className="menu__item"><i data-lucide="user-plus"></i>New employee</button>
+                <button className="menu__item"><i data-lucide="file-text"></i>{d.reimbursement}</button>
+                <button className="menu__item"><i data-lucide="briefcase"></i>{d.businessTrip}</button>
+                <button className="menu__item"><i data-lucide="calendar-plus"></i>{d.overtime}</button>
+                <button className="menu__item"><i data-lucide="clock"></i>{d.shiftChange}</button>
+                <button className="menu__item"><i data-lucide="user-plus"></i>{d.newEmployee}</button>
               </div>
             </div>
           </div>
@@ -156,7 +175,7 @@ export default function Dashboard({ goTo }) {
         {/* Gender Diversity */}
         <div className="stat-card">
           <div className="stat-card__head">
-            <h3 className="stat-card__title">Gender Diversity <span className="info-i"><i data-lucide="info"></i></span></h3>
+            <h3 className="stat-card__title">{d.genderDiversity} <span className="info-i"><i data-lucide="info"></i></span></h3>
             <button className="stat-card__menu" aria-label="more"><i data-lucide="more-vertical"></i></button>
           </div>
           <div className="stat-card__body">
@@ -167,9 +186,9 @@ export default function Dashboard({ goTo }) {
                 <circle cx="50" cy="50" r="36" fill="none" stroke="#fde68a" strokeWidth="18" strokeDasharray="27.2 226.2" strokeDashoffset="-199" transform="rotate(-90 50 50)"/>
               </svg>
               <div className="donut-legend">
-                <div className="donut-legend__row"><span className="donut-legend__dot" style={{background:'#0284c7'}}></span>Female</div>
-                <div className="donut-legend__row"><span className="donut-legend__dot" style={{background:'#87ceeb'}}></span>Male</div>
-                <div className="donut-legend__row"><span className="donut-legend__dot" style={{background:'#fde68a'}}></span>Not Filled</div>
+                <div className="donut-legend__row"><span className="donut-legend__dot" style={{background:'#0284c7'}}></span>{d.female}</div>
+                <div className="donut-legend__row"><span className="donut-legend__dot" style={{background:'#87ceeb'}}></span>{d.male}</div>
+                <div className="donut-legend__row"><span className="donut-legend__dot" style={{background:'#fde68a'}}></span>{d.notFilled}</div>
               </div>
             </div>
           </div>
@@ -179,7 +198,7 @@ export default function Dashboard({ goTo }) {
         {/* Staff Active */}
         <div className="stat-card">
           <div className="stat-card__head">
-            <h3 className="stat-card__title">Staff Active <span className="info-i"><i data-lucide="info"></i></span></h3>
+            <h3 className="stat-card__title">{d.staffActive} <span className="info-i"><i data-lucide="info"></i></span></h3>
             <button className="stat-card__menu" aria-label="more"><i data-lucide="more-vertical"></i></button>
           </div>
           <div className="stat-card__body">
@@ -214,7 +233,7 @@ export default function Dashboard({ goTo }) {
         {/* Monthly Turnover */}
         <div className="stat-card">
           <div className="stat-card__head">
-            <h3 className="stat-card__title">Monthly Turnover <span className="info-i"><i data-lucide="info"></i></span></h3>
+            <h3 className="stat-card__title">{d.monthlyTurnover} <span className="info-i"><i data-lucide="info"></i></span></h3>
             <button className="stat-card__menu" aria-label="more"><i data-lucide="more-vertical"></i></button>
           </div>
           <div className="stat-card__body">
@@ -245,7 +264,7 @@ export default function Dashboard({ goTo }) {
         {/* Job Level */}
         <div className="stat-card">
           <div className="stat-card__head">
-            <h3 className="stat-card__title">Job Level <span className="info-i"><i data-lucide="info"></i></span></h3>
+            <h3 className="stat-card__title">{d.jobLevel} <span className="info-i"><i data-lucide="info"></i></span></h3>
             <button className="stat-card__menu" aria-label="more"><i data-lucide="more-vertical"></i></button>
           </div>
           <div className="stat-card__body">
@@ -260,13 +279,13 @@ export default function Dashboard({ goTo }) {
               <span style={{width:'0.1%',background:'#062234'}}></span>
             </div>
             <div className="joblevel-ticks"><span>0%</span><span>100%</span></div>
-            <div className="joblevel-total"><span>Total</span><b>1000</b></div>
+            <div className="joblevel-total"><span>{d.total}</span><b>1000</b></div>
             <div className="joblevel-list">
               {[['#bce0f3','Staff',400,'40%'],['#0e4a73','Operator',250,'25%'],['#fde68a','Manager',150,'15%'],
                 ['#7eb9d4','Supervisor',100,'10%'],['#0284c7','Intern',60,'6%'],['#cfe6f2','Specialist',30,'3%'],
                 ['#0a3a5a','VP',9,'0.9%'],['#062234','CEO',1,'0.1%']].map(([bg,name,count,pct]) => (
-                <div key={name} className="joblevel-row">
-                  <span className="joblevel-row__sw" style={{background:bg}}></span>
+                <div key={String(name)} className="joblevel-row">
+                  <span className="joblevel-row__sw" style={{background:String(bg)}}></span>
                   <span className="joblevel-row__name">{name}</span>
                   <span className="joblevel-row__count">{count}</span>
                   <span className="joblevel-row__pct">{pct}</span>
@@ -285,24 +304,24 @@ export default function Dashboard({ goTo }) {
         {/* Quick Links */}
         <aside className="qlinks">
           <div>
-            <h4 className="qlinks__heading">Quick Links</h4>
+            <h4 className="qlinks__heading">{d.quickLinks}</h4>
             <div className="qlinks__list">
-              <a className="qlink"><i data-lucide="user" className="qlink__icon"></i>Employee Profile</a>
-              <a className="qlink"><i data-lucide="repeat" className="qlink__icon"></i>Employee Transfer</a>
-              <a className="qlink"><i data-lucide="building" className="qlink__icon"></i>Company Settings</a>
-              <a className="qlink"><i data-lucide="puzzle" className="qlink__icon"></i>Integrations</a>
+              <a className="qlink"><i data-lucide="user" className="qlink__icon"></i>{d.employeeProfile}</a>
+              <a className="qlink"><i data-lucide="repeat" className="qlink__icon"></i>{d.transfer}</a>
+              <a className="qlink"><i data-lucide="building" className="qlink__icon"></i>{d.companySettings}</a>
+              <a className="qlink"><i data-lucide="puzzle" className="qlink__icon"></i>{d.integrations}</a>
             </div>
           </div>
           <div>
-            <h4 className="qlinks__heading">Application</h4>
+            <h4 className="qlinks__heading">{d.application}</h4>
             <div className="qlinks__list">
-              <a className="qlink"><i data-lucide="file-text" className="qlink__icon"></i>Forms</a>
-              <a className="qlink"><i data-lucide="award" className="qlink__icon"></i>Performance Review</a>
-              <a className="qlink"><i data-lucide="users-round" className="qlink__icon"></i>Talent Management</a>
-              <a className="qlink"><i data-lucide="lightbulb" className="qlink__icon"></i>Insight</a>
-              <a className="qlink"><i data-lucide="calendar-clock" className="qlink__icon"></i>Timesheet</a>
-              <a className="qlink"><i data-lucide="file-stack" className="qlink__icon"></i>Document Template</a>
-              <a className="qlink"><i data-lucide="graduation-cap" className="qlink__icon"></i>Training</a>
+              <a className="qlink"><i data-lucide="file-text" className="qlink__icon"></i>{d.forms}</a>
+              <a className="qlink"><i data-lucide="award" className="qlink__icon"></i>{d.performanceReview}</a>
+              <a className="qlink"><i data-lucide="users-round" className="qlink__icon"></i>{d.talentManagement}</a>
+              <a className="qlink"><i data-lucide="lightbulb" className="qlink__icon"></i>{d.insight}</a>
+              <a className="qlink"><i data-lucide="calendar-clock" className="qlink__icon"></i>{d.timesheet}</a>
+              <a className="qlink"><i data-lucide="file-stack" className="qlink__icon"></i>{d.documentTemplate}</a>
+              <a className="qlink"><i data-lucide="graduation-cap" className="qlink__icon"></i>{d.training}</a>
             </div>
           </div>
         </aside>
@@ -310,11 +329,11 @@ export default function Dashboard({ goTo }) {
         {/* Banner */}
         <div className="banner">
           <div className="banner__art" aria-hidden="true">
-            <img src={bannerImg} alt="" draggable="false"/>
+            <img src={bannerImg} alt="" draggable={false}/>
           </div>
           <div className="banner__copy">
-            <p className="banner__text">Pantau kehadiran tim secara real-time dan setujui permintaan cuti dengan lebih cepat melalui sistem HRIS.</p>
-            <a className="banner__cta">Pelajari Selengkapnya <i data-lucide="arrow-right"></i></a>
+            <p className="banner__text">{d.bannerText}</p>
+            <a className="banner__cta">{t.common.learnMore} <i data-lucide="arrow-right"></i></a>
           </div>
           <div className="banner__dots">
             {[0,1,2,3].map(i => (
@@ -327,34 +346,39 @@ export default function Dashboard({ goTo }) {
         <div className="side-stack">
           <div className="leave-card">
             <div className="leave-section">
-              <span className="leave-section__label">Annual Leave Balance <span className="info-i"><i data-lucide="info"></i></span></span>
-              <span className="leave-section__value">10 <small>Days</small></span>
-              <a className="leave-section__cta">Request annual leave <i data-lucide="arrow-right"></i></a>
+              <span className="leave-section__label">{d.annualLeaveBalance} <span className="info-i"><i data-lucide="info"></i></span></span>
+              <span className="leave-section__value">10 <small>{t.common.days}</small></span>
+              <a className="leave-section__cta">{d.requestAnnualLeave} <i data-lucide="arrow-right"></i></a>
             </div>
             <div className="leave-card__divider"></div>
             <div className="leave-section">
-              <span className="leave-section__label">Sick Leave Used</span>
-              <span className="leave-section__value">4 <small>Days</small></span>
-              <a className="leave-section__cta">Request sick leave <i data-lucide="arrow-right"></i></a>
+              <span className="leave-section__label">{d.sickLeaveUsed}</span>
+              <span className="leave-section__value">4 <small>{t.common.days}</small></span>
+              <a className="leave-section__cta">{d.requestSickLeave} <i data-lucide="arrow-right"></i></a>
             </div>
-            <a className="leave-card__viewall">View all</a>
+            <a className="leave-card__viewall">{t.common.viewAll}</a>
           </div>
 
           <div className="whoisoff-card">
             <div className="whoisoff-card__head">
-              <h4 className="whoisoff-card__title">Who's Off</h4>
-              <button className="whoisoff-card__pick">Today <i data-lucide="chevron-down"></i></button>
+              <h4 className="whoisoff-card__title">{d.whosOff}</h4>
+              <button className="whoisoff-card__pick">{t.common.today} <i data-lucide="chevron-down"></i></button>
             </div>
-            <div className="whoisoff-card__date">Tue, 09 December 2025</div>
+            <div className="whoisoff-card__date">Thu, 28 May 2026</div>
             <div>
-              {['Mitsui Tiga','Mitsui Empat','Mitsui Lima'].map(name => (
-                <div key={name} className="whoisoff-row">
+              {WHOS_OFF.map(emp => (
+                <div key={emp.name} className="whoisoff-row">
                   <div className="whoisoff-row__avatar">
-                    <svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#5db95d"/><circle cx="18" cy="14" r="9" fill="#a8d479"/><path d="M6 36 q4 -9 12 -9 q8 0 12 9z" fill="#2b6a2b"/></svg>
+                    <svg viewBox="0 0 36 36">
+                      <rect width="36" height="36" fill={emp.color}/>
+                      <text x="18" y="23" textAnchor="middle" fontFamily="Plus Jakarta Sans, sans-serif" fontSize="13" fontWeight="700" fill={emp.textColor}>
+                        {emp.name.split(' ').map(n => n[0]).slice(0,2).join('')}
+                      </text>
+                    </svg>
                   </div>
                   <div className="whoisoff-row__meta">
-                    <span className="whoisoff-row__name">{name}</span>
-                    <span className="whoisoff-row__sub">Cuti Tahunan</span>
+                    <span className="whoisoff-row__name">{emp.name}</span>
+                    <span className="whoisoff-row__sub">{d.annualLeaveType}</span>
                   </div>
                 </div>
               ))}
@@ -367,24 +391,24 @@ export default function Dashboard({ goTo }) {
       {/* =========== TABLE CARD =========== */}
       <section className="table-card">
         <div className="tabs-pills">
-          {['Announcement','Contract & Probation','Tasks'].map(t => (
-            <button key={t} className={`tab-pill${tableTab === t ? ' is-on' : ''}`} onClick={() => setTableTab(t)}>{t}</button>
+          {[d.announcement, d.contractProbation, d.tasks].map(tab => (
+            <button key={tab} className={`tab-pill${tableTab === tab ? ' is-on' : ''}`} onClick={() => setTableTab(tab)}>{tab}</button>
           ))}
         </div>
 
         <div className="info-banner">
           <span className="info-banner__icon"></span>
-          <span>Introducing the Evaluation Review Cycle. Elevate your organization's success with the power of timely and data-driven review! <a href="#" onClick={e => e.preventDefault()}>Learn more</a></span>
+          <span>{d.filterIntroNote} <a href="#" onClick={e => e.preventDefault()}>{t.common.learnMore}</a></span>
         </div>
 
         <div className="table-toolbar">
           <button className="table-toolbar__filter">
-            <span style={{display:'inline-flex',alignItems:'center',gap:'6px'}}><i data-lucide="filter"></i>Filter</span>
+            <span style={{display:'inline-flex',alignItems:'center',gap:'6px'}}><i data-lucide="filter"></i>{t.common.filter}</span>
             <i data-lucide="chevron-down"></i>
           </button>
           <button className="table-toolbar__icon" aria-label="Notifications"><i data-lucide="bell"></i><span className="dot"></span></button>
           <div className="table-toolbar__search">
-            <input type="text" placeholder="Search here"/>
+            <input type="text" placeholder={t.common.search}/>
             <i data-lucide="search"></i>
           </div>
         </div>
@@ -393,20 +417,20 @@ export default function Dashboard({ goTo }) {
           <thead>
             <tr>
               <th><label className="checkbox" style={{margin:0}}><input type="checkbox"/><span className="checkbox__box"></span></label></th>
-              <th>Employee</th>
-              <th>Status</th>
-              <th>End Date</th>
-              <th>Total Contract Duration</th>
+              <th>{d.colEmployee}</th>
+              <th>{d.colStatus}</th>
+              <th>{d.colEndDate}</th>
+              <th>{d.colContractDuration}</th>
             </tr>
           </thead>
           <tbody>
-            {[1,2,3].map(i => (
-              <tr key={i}>
+            {CONTRACT_ROWS.map(row => (
+              <tr key={row.name}>
                 <td><label className="checkbox" style={{margin:0}}><input type="checkbox"/><span className="checkbox__box"></span></label></td>
-                <td>Lorem Ipsum</td>
-                <td><span className="status-pill">Active</span></td>
-                <td>12/12/2025</td>
-                <td>12 Months</td>
+                <td>{row.name}</td>
+                <td><span className="status-pill">{row.status}</span></td>
+                <td>{row.endDate}</td>
+                <td>{row.duration}</td>
               </tr>
             ))}
           </tbody>
@@ -414,9 +438,9 @@ export default function Dashboard({ goTo }) {
 
         <div className="table-foot">
           <div className="table-foot__left">
-            <span>Showing</span>
+            <span>{t.common.showing}</span>
             <button className="table-foot__select">10 <i data-lucide="chevron-down"></i></button>
-            <span>from 3 rows</span>
+            <span>{t.common.from} {CONTRACT_ROWS.length} {t.common.rows}</span>
           </div>
           <div className="table-foot__pages">
             <button className="table-foot__btn" aria-label="first" disabled><i data-lucide="chevrons-left"></i></button>
@@ -424,7 +448,7 @@ export default function Dashboard({ goTo }) {
             <span className="table-foot__page-input">1</span>
             <button className="table-foot__btn" aria-label="next"><i data-lucide="chevron-right"></i></button>
             <button className="table-foot__btn" aria-label="last"><i data-lucide="chevrons-right"></i></button>
-            <span style={{marginLeft:'8px'}}>from 1</span>
+            <span style={{marginLeft:'8px'}}>{t.common.from} 1</span>
           </div>
         </div>
       </section>

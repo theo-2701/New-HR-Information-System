@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useT, useLocaleStore } from '@/i18n'
 
 const PRODUCTS = [
   { id: 'HRIS',        icon: 'users',      name: 'HRIS',                   desc: 'Human Resource Information System' },
@@ -7,12 +8,12 @@ const PRODUCTS = [
   { id: 'Insights',    icon: 'line-chart', name: 'Insights',               desc: 'AI workforce analytics' },
 ]
 
-export const NOTIFS = [
-  { cat: 'payroll',       icon: 'wallet',       iconClass: 'notif-icon--payroll',    source: 'SEVAKA Payroll',     time: '13:47',   unread: true,  tag: 'Payroll',       tagClass: 'tag-payroll',    msg: 'Proses kalkulasi <b>payroll periode 05/2026</b> selesai. Siap untuk persetujuan.' },
-  { cat: 'timeoff',       icon: 'calendar-x-2', iconClass: 'notif-icon--timeoff',    source: 'Lia Permata',        time: '11:20',   unread: true,  tag: 'Time Off',      tagClass: 'tag-timeoff',    msg: 'Mengajukan <b>cuti tahunan 3 hari</b> (10–12 Jun) — menunggu persetujuan Anda.' },
-  { cat: 'attendance',    icon: 'clock-alert',  iconClass: 'notif-icon--attendance', source: 'SEVAKA Attendance',  time: '09:15',   unread: true,  tag: 'Attendance',    tagClass: 'tag-attendance', msg: 'Anda belum melakukan <b>clock-out</b> kemarin (27 Mei). Mohon konfirmasi.' },
-  { cat: 'reimbursement', icon: 'receipt',      iconClass: 'notif-icon--reimburse',  source: 'SEVAKA Finance',     time: 'Kemarin', unread: false, tag: 'Reimbursement', tagClass: 'tag-reimburse',  msg: 'Reimbursement <b>Rp 1.250.000</b> telah disetujui dan akan dibayar 31 Mei.' },
-  { cat: 'mpp',           icon: 'users-round',  iconClass: 'notif-icon--mpp',        source: 'Theodorus F.K.',     time: '2 hari',  unread: false, tag: 'MPP',           tagClass: 'tag-mpp',        msg: '<b>Manpower Plan Q3 2026</b> telah diperbarui — silakan tinjau alokasi divisi Engineering.' },
+const NOTIF_META = [
+  { cat: 'payroll',       icon: 'wallet',       iconClass: 'notif-icon--payroll',    unread: true  },
+  { cat: 'timeoff',       icon: 'calendar-x-2', iconClass: 'notif-icon--timeoff',    unread: true  },
+  { cat: 'attendance',    icon: 'clock-alert',  iconClass: 'notif-icon--attendance', unread: true  },
+  { cat: 'reimbursement', icon: 'receipt',      iconClass: 'notif-icon--reimburse',  unread: false },
+  { cat: 'mpp',           icon: 'users-round',  iconClass: 'notif-icon--mpp',        unread: false },
 ]
 
 interface TopnavProps {
@@ -21,10 +22,14 @@ interface TopnavProps {
 }
 
 export default function Topnav({ bellActive = false, onInboxNavigate }: TopnavProps) {
+  const t = useT()
+  const n = t.notifications
+  const { locale, toggleLocale } = useLocaleStore()
+
   const [pickerOpen, setPickerOpen] = useState(false)
   const [activeProduct, setActiveProduct] = useState('HRIS')
   const [notifOpen, setNotifOpen] = useState(false)
-  const [notifs, setNotifs] = useState(NOTIFS)
+  const [unreadState, setUnreadState] = useState(NOTIF_META.map(m => m.unread))
   const [notifTab, setNotifTab] = useState<'all' | 'unread' | 'mentions'>('all')
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
@@ -46,15 +51,21 @@ export default function Topnav({ bellActive = false, onInboxNavigate }: TopnavPr
     if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': '1.75' } })
   })
 
-  const unreadCount = notifs.filter(n => n.unread).length
+  const unreadCount = unreadState.filter(Boolean).length
 
   function markAllRead() {
-    setNotifs(ns => ns.map(n => ({ ...n, unread: false })))
+    setUnreadState(NOTIF_META.map(() => false))
   }
 
+  const notifs = NOTIF_META.map((meta, i) => ({
+    ...meta,
+    ...n.items[i],
+    unread: unreadState[i],
+  }))
+
   function visibleNotifs() {
-    if (notifTab === 'unread')   return notifs.filter(n => n.unread)
-    if (notifTab === 'mentions') return notifs.filter(n => n.cat === 'timeoff')
+    if (notifTab === 'unread')   return notifs.filter(x => x.unread)
+    if (notifTab === 'mentions') return notifs.filter(x => x.cat === 'timeoff')
     return notifs
   }
 
@@ -68,6 +79,8 @@ export default function Topnav({ bellActive = false, onInboxNavigate }: TopnavPr
     setNotifOpen(false)
     if (onInboxNavigate) onInboxNavigate()
   }
+
+  const tabKeys = ['all', 'unread', 'mentions'] as const
 
   return (
     <header className="topnav">
@@ -125,6 +138,18 @@ export default function Topnav({ bellActive = false, onInboxNavigate }: TopnavPr
         <button className="pill-ai" type="button">
           <i data-lucide="sparkles" />SUMMARIZE DATA
         </button>
+
+        {/* Language toggle */}
+        <button
+          className="icon-btn"
+          aria-label="Toggle language"
+          title={locale === 'en' ? 'Switch to Indonesian' : 'Switch to English'}
+          onClick={toggleLocale}
+          style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '.04em', minWidth: '36px' }}
+        >
+          {locale === 'en' ? 'EN' : 'ID'}
+        </button>
+
         <button className="icon-btn" aria-label="add"><i data-lucide="plus" /></button>
         <button className="icon-btn" aria-label="search"><i data-lucide="search" /></button>
 
@@ -139,50 +164,50 @@ export default function Topnav({ bellActive = false, onInboxNavigate }: TopnavPr
             {unreadCount > 0 && <span className="dot" aria-hidden="true" />}
           </button>
 
-          <div className={`notif-pop${notifOpen ? ' is-open' : ''}`} role="dialog" aria-label="Notifications">
+          <div className={`notif-pop${notifOpen ? ' is-open' : ''}`} role="dialog" aria-label={n.title}>
             <div className="notif-pop__arrow" aria-hidden="true" />
             <header className="notif-pop__head">
               <div className="notif-pop__heading">
-                <span className="notif-pop__title">Notifications</span>
+                <span className="notif-pop__title">{n.title}</span>
                 {unreadCount > 0 && (
-                  <span className="notif-pop__badge">{unreadCount} new</span>
+                  <span className="notif-pop__badge">{unreadCount} {n.new}</span>
                 )}
               </div>
               <button className="notif-pop__markread" type="button" onClick={markAllRead}>
-                Mark all read
+                {n.markAllRead}
               </button>
             </header>
 
             <div className="notif-pop__tabs" role="tablist">
-              {(['all', 'unread', 'mentions'] as const).map(t => (
+              {tabKeys.map(tk => (
                 <button
-                  key={t}
-                  className={`notif-pop__tab${notifTab === t ? ' is-on' : ''}`}
-                  onClick={() => setNotifTab(t)}
+                  key={tk}
+                  className={`notif-pop__tab${notifTab === tk ? ' is-on' : ''}`}
+                  onClick={() => setNotifTab(tk)}
                 >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                  {n.tabs[tk]}
                 </button>
               ))}
             </div>
 
             <ul className="notif-pop__list">
-              {visibleNotifs().map((n, i) => (
+              {visibleNotifs().map((notif, i) => (
                 <li
                   key={i}
-                  className={`notif-item${n.unread ? ' is-unread' : ''}`}
-                  data-cat={n.cat}
-                  onClick={() => handleNotifItemClick(n.cat)}
+                  className={`notif-item${notif.unread ? ' is-unread' : ''}`}
+                  data-cat={notif.cat}
+                  onClick={() => handleNotifItemClick(notif.cat)}
                 >
-                  <span className={`notif-item__icon ${n.iconClass}`}>
-                    <i data-lucide={n.icon} />
+                  <span className={`notif-item__icon ${notif.iconClass}`}>
+                    <i data-lucide={notif.icon} />
                   </span>
                   <div className="notif-item__body">
                     <div className="notif-item__row">
-                      <span className="notif-item__source">{n.source}</span>
-                      <span className="notif-item__time">{n.time}</span>
+                      <span className="notif-item__source">{notif.source}</span>
+                      <span className="notif-item__time">{notif.time}</span>
                     </div>
-                    <p className="notif-item__msg" dangerouslySetInnerHTML={{ __html: n.msg }} />
-                    <span className={`notif-item__tag ${n.tagClass}`}>{n.tag}</span>
+                    <p className="notif-item__msg" dangerouslySetInnerHTML={{ __html: notif.msg }} />
+                    <span className={`notif-item__tag tag-${notif.cat}`}>{notif.tag}</span>
                   </div>
                   <span className="notif-item__unread" aria-label="unread" />
                 </li>
@@ -191,7 +216,7 @@ export default function Topnav({ bellActive = false, onInboxNavigate }: TopnavPr
 
             <footer className="notif-pop__foot">
               <a className="notif-pop__cta" href="#inbox" onClick={handleInboxCta}>
-                <span>Lihat semua di Inbox</span>
+                <span>{n.viewAllInbox}</span>
                 <i data-lucide="arrow-right" />
               </a>
             </footer>

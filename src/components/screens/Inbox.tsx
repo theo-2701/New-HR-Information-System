@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+// i18n hook available for future locale wiring
+// import { useT } from '@/i18n'
 
 // ─────────────────────────────────────────────
 // Types
@@ -18,23 +20,23 @@ interface Message {
 }
 
 // ─────────────────────────────────────────────
-// Data
+// Data — all in English
 // ─────────────────────────────────────────────
 const INITIAL_MESSAGES: Message[] = [
-  { id: 1,  cat: 'payroll',       icon: 'wallet',       source: 'SEVAKA Payroll',     subject: 'Run Payroll',                   tag: 'Payroll',       unread: true,  date: '28 Mei 2026', time: '13:47', preview: 'Proses kalkulasi payroll periode 05/2026 telah selesai dan siap diproses lebih lanjut.', template: 'payroll-run' },
-  { id: 2,  cat: 'timeoff',       icon: 'calendar-x-2', source: 'Lia Permata',        subject: 'Permohonan Cuti Tahunan',       tag: 'Time Off',      unread: true,  date: '28 Mei 2026', time: '11:20', preview: 'Mengajukan cuti tahunan selama 3 hari (10–12 Juni 2026). Menunggu persetujuan Anda.', template: 'timeoff-request',   data: { name: 'Lia Permata',   position: 'Product Designer',   dates: '10–12 Juni 2026', days: 3,  type: 'Cuti Tahunan', balance: 7,  reason: 'Acara keluarga di luar kota.' } },
-  { id: 3,  cat: 'attendance',    icon: 'clock-alert',  source: 'SEVAKA Attendance',  subject: 'Reminder: Clock-out',           tag: 'Attendance',    unread: true,  date: '28 Mei 2026', time: '09:15', preview: 'Anda belum melakukan clock-out kemarin (27 Mei 2026). Mohon konfirmasi.', template: 'attendance-clockout', data: { clockIn: '08:14', clockOut: '—', date: '27 Mei 2026' } },
-  { id: 4,  cat: 'payroll',       icon: 'wallet',       source: 'SEVAKA Payroll',     subject: 'Payslip Periode 04/2026 Tersedia', tag: 'Payroll',    unread: true,  date: '27 Mei 2026', time: '16:02', preview: 'Payslip Anda untuk periode April 2026 sudah dapat diunduh dari modul Payroll.', template: 'payroll-payslip' },
-  { id: 5,  cat: 'changedata',    icon: 'user-cog',     source: 'Andreas Wijaya',     subject: 'Permohonan Ubah Data',          tag: 'Change Data',   unread: true,  date: '27 Mei 2026', time: '14:30', preview: 'Mengajukan perubahan nomor rekening bank — menunggu persetujuan.', template: 'changedata-request',  data: { name: 'Andreas Wijaya', field: 'Nomor Rekening Bank', before: '1234567890 (BCA)', after: '9876543210 (Mandiri)' } },
-  { id: 6,  cat: 'timeoff',       icon: 'calendar-x-2', source: 'Bagas Pratama',      subject: 'Cuti Sakit',                    tag: 'Time Off',      unread: false, date: '27 Mei 2026', time: '10:05', preview: 'Mengajukan cuti sakit 1 hari dengan lampiran surat dokter.', template: 'timeoff-request',     data: { name: 'Bagas Pratama', position: 'Backend Engineer', dates: '27 Mei 2026', days: 1, type: 'Cuti Sakit', balance: 11, reason: 'Demam, dengan lampiran surat dokter.' } },
-  { id: 7,  cat: 'reimbursement', icon: 'receipt',      source: 'SEVAKA Finance',     subject: 'Reimbursement Disetujui',       tag: 'Reimbursement', unread: false, date: '26 Mei 2026', time: '17:44', preview: 'Reimbursement transportasi sebesar Rp 1.250.000 telah disetujui.', template: 'reimburse-approved',  data: { amount: 'Rp 1.250.000', category: 'Transportasi', payoutDate: '31 Mei 2026' } },
-  { id: 8,  cat: 'overtime',      icon: 'hourglass',    source: 'Putu Sentana',       subject: 'Pengajuan Lembur',              tag: 'Overtime',      unread: false, date: '26 Mei 2026', time: '15:10', preview: 'Pengajuan lembur 3 jam (Jumat, 30 Mei 2026) untuk proyek Q2 closing.', template: 'overtime-request',    data: { name: 'Putu Sentana', date: '30 Mei 2026', hours: 3, project: 'Q2 Financial Close' } },
-  { id: 9,  cat: 'announcement',  icon: 'megaphone',    source: 'HRD SEVAKA',         subject: 'Penyesuaian Hari Libur',        tag: 'Announcement',  unread: false, date: '26 Mei 2026', time: '09:30', preview: 'Pengumuman penyesuaian hari libur nasional periode Juni 2026.', template: 'announcement-generic',data: { headline: 'Penyesuaian Hari Libur Nasional — Juni 2026', body: 'Sehubungan dengan kalender pemerintah terbaru, hari libur 1 Juni (Hari Lahir Pancasila) jatuh pada hari Senin. Cuti bersama tidak diberlakukan.' } },
-  { id: 10, cat: 'mpp',           icon: 'users-round',  source: 'Theodorus F.K.',     subject: 'Update MPP Q3 2026',            tag: 'MPP',           unread: false, date: '25 Mei 2026', time: '11:00', preview: 'Manpower plan Q3 2026 telah diperbarui — harap tinjau alokasi divisi Engineering.', template: 'mpp-update' },
-  { id: 11, cat: 'transfer',      icon: 'users',        source: 'SEVAKA Employees',   subject: 'Mutasi Karyawan — Surabaya',    tag: 'Transfer',      unread: false, date: '24 Mei 2026', time: '13:48', preview: 'Sdr. Yota Rogers dimutasi dari Jakarta ke kantor cabang Surabaya per 1 Juli 2026.', template: 'transfer-notice',     data: { name: 'Yota Rogers', from: 'Jakarta HQ', to: 'Cabang Surabaya', effective: '1 Juli 2026' } },
-  { id: 12, cat: 'timeoff',       icon: 'calendar-x-2', source: 'Made Adit',          subject: 'Cuti Tahunan — Disetujui',      tag: 'Time Off',      unread: false, date: '23 Mei 2026', time: '09:11', preview: 'Cuti tahunan 2 hari (5–6 Juni) telah disetujui oleh atasan Anda.', template: 'timeoff-approved',    data: { dates: '5–6 Juni 2026', days: 2 } },
-  { id: 13, cat: 'attendance',    icon: 'clock-alert',  source: 'SEVAKA Attendance',  subject: 'Live Attendance Aktif',         tag: 'Attendance',    unread: false, date: '22 Mei 2026', time: '07:55', preview: 'Fitur Live Attendance kini aktif. Pastikan lokasi Anda dalam radius kantor saat clock-in.', template: 'announcement-generic', data: { headline: 'Live Attendance — Aktif', body: 'Fitur Live Attendance dengan validasi GPS telah aktif untuk seluruh karyawan. Pastikan lokasi Anda dalam radius kantor saat melakukan clock-in dan clock-out.' } },
-  { id: 14, cat: 'changedata',    icon: 'user-cog',     source: 'SEVAKA Profile',     subject: 'Konfirmasi Email',              tag: 'Change Data',   unread: false, date: '21 Mei 2026', time: '16:25', preview: 'Perubahan email pada profil Anda telah dikonfirmasi.', template: 'changedata-confirm' },
+  { id: 1,  cat: 'payroll',       icon: 'wallet',       source: 'SEVAKA Payroll',     subject: 'Payroll Run',                       tag: 'Payroll',       unread: true,  date: '28 May 2026',  time: '13:47', preview: 'Payroll calculation for period 05/2026 is complete and ready for further processing.', template: 'payroll-run' },
+  { id: 2,  cat: 'timeoff',       icon: 'calendar-x-2', source: 'Lia Permata',        subject: 'Annual Leave Request',              tag: 'Time Off',      unread: true,  date: '28 May 2026',  time: '11:20', preview: 'Requesting 3-day annual leave (10–12 June 2026). Awaiting your approval.', template: 'timeoff-request',   data: { name: 'Lia Permata',   position: 'Product Designer',  dates: '10–12 June 2026', days: 3,  type: 'Annual Leave',       balance: 7,  reason: 'Family event out of town.' } },
+  { id: 3,  cat: 'attendance',    icon: 'clock-alert',  source: 'SEVAKA Attendance',  subject: 'Reminder: Clock-out Missing',       tag: 'Attendance',    unread: true,  date: '28 May 2026',  time: '09:15', preview: 'You did not clock out yesterday (27 May 2026). Please confirm your departure time.', template: 'attendance-clockout', data: { clockIn: '08:14', clockOut: '—', date: '27 May 2026' } },
+  { id: 4,  cat: 'payroll',       icon: 'wallet',       source: 'SEVAKA Payroll',     subject: 'Payslip Period 04/2026 Available',  tag: 'Payroll',       unread: true,  date: '27 May 2026',  time: '16:02', preview: 'Your payslip for April 2026 is available and can be downloaded from the Payroll module.', template: 'payroll-payslip' },
+  { id: 5,  cat: 'changedata',    icon: 'user-cog',     source: 'Andreas Wijaya',     subject: 'Change Data Request',               tag: 'Change Data',   unread: true,  date: '27 May 2026',  time: '14:30', preview: 'Requesting a bank account number change — awaiting approval.', template: 'changedata-request',  data: { name: 'Andreas Wijaya', field: 'Bank Account Number', before: '1234567890 (BCA)', after: '9876543210 (Mandiri)' } },
+  { id: 6,  cat: 'timeoff',       icon: 'calendar-x-2', source: 'Bagas Pratama',      subject: 'Sick Leave Request',                tag: 'Time Off',      unread: false, date: '27 May 2026',  time: '10:05', preview: 'Requesting 1-day sick leave with a doctor\'s note attached.', template: 'timeoff-request',     data: { name: 'Bagas Pratama', position: 'Backend Engineer',  dates: '27 May 2026',     days: 1,  type: 'Sick Leave',         balance: 11, reason: 'Fever, with attached doctor\'s note.' } },
+  { id: 7,  cat: 'reimbursement', icon: 'receipt',      source: 'SEVAKA Finance',     subject: 'Reimbursement Approved',            tag: 'Reimbursement', unread: false, date: '26 May 2026',  time: '17:44', preview: 'Transportation reimbursement of Rp 1,250,000 has been approved.', template: 'reimburse-approved',  data: { amount: 'Rp 1,250,000', category: 'Transportation', payoutDate: '31 May 2026' } },
+  { id: 8,  cat: 'overtime',      icon: 'hourglass',    source: 'Putu Sentana',       subject: 'Overtime Request',                  tag: 'Overtime',      unread: false, date: '26 May 2026',  time: '15:10', preview: 'Requesting 3 hours of overtime (Friday, 30 May 2026) for the Q2 closing project.', template: 'overtime-request',    data: { name: 'Putu Sentana', date: '30 May 2026', hours: 3, project: 'Q2 Financial Close' } },
+  { id: 9,  cat: 'announcement',  icon: 'megaphone',    source: 'SEVAKA HR',          subject: 'Public Holiday Adjustment',         tag: 'Announcement',  unread: false, date: '26 May 2026',  time: '09:30', preview: 'Announcement on national public holiday adjustment for June 2026.', template: 'announcement-generic', data: { headline: 'National Holiday Adjustment — June 2026', body: 'In accordance with the latest government calendar, 1 June (Pancasila Day) falls on a Monday. No joint leave (cuti bersama) will be applied.' } },
+  { id: 10, cat: 'mpp',           icon: 'users-round',  source: 'Theodorus F.K.',     subject: 'MPP Q3 2026 Update',                tag: 'MPP',           unread: false, date: '25 May 2026',  time: '11:00', preview: 'Manpower plan Q3 2026 has been updated — please review the Engineering division allocation.', template: 'mpp-update' },
+  { id: 11, cat: 'transfer',      icon: 'users',        source: 'SEVAKA Employees',   subject: 'Employee Transfer — Surabaya',      tag: 'Transfer',      unread: false, date: '24 May 2026',  time: '13:48', preview: 'Yota Rogers has been transferred from Jakarta HQ to Surabaya Branch, effective 1 July 2026.', template: 'transfer-notice',     data: { name: 'Yota Rogers', from: 'Jakarta HQ', to: 'Surabaya Branch', effective: '1 July 2026' } },
+  { id: 12, cat: 'timeoff',       icon: 'calendar-x-2', source: 'Made Aditya',        subject: 'Annual Leave — Approved',           tag: 'Time Off',      unread: false, date: '23 May 2026',  time: '09:11', preview: '2-day annual leave (5–6 June) has been approved by your manager.', template: 'timeoff-approved',    data: { dates: '5–6 June 2026', days: 2 } },
+  { id: 13, cat: 'attendance',    icon: 'clock-alert',  source: 'SEVAKA Attendance',  subject: 'Live Attendance Activated',         tag: 'Attendance',    unread: false, date: '22 May 2026',  time: '07:55', preview: 'The Live Attendance feature is now active. Make sure your location is within office range when clocking in.', template: 'announcement-generic', data: { headline: 'Live Attendance — Active', body: 'The Live Attendance feature with GPS validation is now active for all employees. Make sure your location is within the office radius when clocking in and out.' } },
+  { id: 14, cat: 'changedata',    icon: 'user-cog',     source: 'SEVAKA Profile',     subject: 'Email Confirmation',                tag: 'Change Data',   unread: false, date: '21 May 2026',  time: '16:25', preview: 'The email change on your profile has been confirmed.', template: 'changedata-confirm' },
 ]
 
 const CAT_META: Record<string, { label: string; tile: string; tag: string }> = {
@@ -61,7 +63,7 @@ function catLabel(cat: string) {
 }
 
 function isApproval(m: Message) {
-  return ['timeoff','overtime','changedata','reimbursement'].includes(m.cat) && /Pengajuan|Permohonan/i.test(m.subject + ' ' + m.preview)
+  return ['timeoff','overtime','changedata','reimbursement'].includes(m.cat) && /Request|Requesting/i.test(m.subject + ' ' + m.preview)
 }
 
 // ─────────────────────────────────────────────
@@ -75,8 +77,8 @@ function DetailEmpty() {
           <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
         </svg>
       </div>
-      <h2 className="detail-empty__title">Pilih sebuah pesan</h2>
-      <p className="detail-empty__sub">Pilih satu pesan dari daftar di sebelah kiri untuk melihat detailnya — laporan, lampiran, dan langkah lanjutan akan muncul di sini.</p>
+      <h2 className="detail-empty__title">Select a message</h2>
+      <p className="detail-empty__sub">Select a message from the list on the left to view its details — reports, attachments, and next steps will appear here.</p>
     </div>
   )
 }
@@ -123,9 +125,9 @@ function DetailBody({ m }: { m: Message }) {
           </div>
         </div>
         <p className="detail__intro">
-          Hai <b>Tony Stark</b>, proses kalkulasi <b>payroll periode 05/2026</b> telah selesai.{' '}
-          Anda dapat <a href="#" onClick={e => e.preventDefault()}>meminta persetujuan</a>, mengunci/membuka payroll,
-          mempublikasikan slip gaji, mengunduh e-banking, serta melakukan disbursement melalui halaman <b>Payroll History</b>.
+          Hi <b>Tony Stark</b>, the payroll calculation for <b>period 05/2026</b> is complete.{' '}
+          You can <a href="#" onClick={e => e.preventDefault()}>request approval</a>, lock/unlock payroll,
+          publish payslips, download e-banking files, and process disbursements via the <b>Payroll History</b> page.
         </p>
         <div className="detail__primary-cta">
           <button className="btn-primary"><i data-lucide="bar-chart-3" />View Report</button>
@@ -137,7 +139,7 @@ function DetailBody({ m }: { m: Message }) {
             <div className="detail__followup-thumb"><i data-lucide="banknote" /></div>
             <div className="detail__followup-body">
               <span className="detail__followup-title">Payroll Disbursement</span>
-              <p className="detail__followup-desc">Satu klik untuk mendistribusikan gaji karyawan Anda secara instan ke lebih dari 150 bank di Indonesia, tanpa biaya.</p>
+              <p className="detail__followup-desc">One click to instantly distribute employee salaries to over 150 banks in Indonesia, at no cost.</p>
               <a className="detail__followup-link" href="#" onClick={e => e.preventDefault()}>Request demo →</a>
             </div>
           </div>
@@ -148,7 +150,7 @@ function DetailBody({ m }: { m: Message }) {
             <div className="detail__followup-thumb"><i data-lucide="landmark" /></div>
             <div className="detail__followup-body">
               <span className="detail__followup-title">E-Banking</span>
-              <p className="detail__followup-desc">Gunakan fitur e-banking untuk upload ke sistem bank yang dapat digunakan untuk pembayaran payroll.</p>
+              <p className="detail__followup-desc">Use the e-banking feature to upload files to your bank's system for payroll payment processing.</p>
             </div>
           </div>
         </div>
@@ -157,12 +159,12 @@ function DetailBody({ m }: { m: Message }) {
 
     case 'payroll-payslip': return (
       <div className="detail__body">
-        <p className="detail__intro">Payslip Anda untuk <b>periode April 2026</b> sudah tersedia. Anda dapat mengunduhnya dari modul Payroll atau menyalin ringkasannya ke email.</p>
+        <p className="detail__intro">Your payslip for <b>period April 2026</b> is now available. You can download it from the Payroll module or copy the summary to email.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Periode</span><span className="detail__info-value">April 2026</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Net Pay</span><span className="detail__info-value">Rp 12.450.000</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal Cair</span><span className="detail__info-value">28 April 2026</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Rekening</span><span className="detail__info-value">BCA •••• 7890</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Period</span><span className="detail__info-value">April 2026</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Net Pay</span><span className="detail__info-value">Rp 12,450,000</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Payment Date</span><span className="detail__info-value">28 April 2026</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Account</span><span className="detail__info-value">BCA •••• 7890</span></div>
         </div>
         <div className="detail__primary-cta">
           <button className="btn-primary"><i data-lucide="download" />Download Payslip</button>
@@ -176,70 +178,70 @@ function DetailBody({ m }: { m: Message }) {
         <div className="detail__hero-art">
           <div className="req-avatar">{(d.name ?? '?').split(' ').map(n => n[0]).slice(0, 2).join('')}</div>
         </div>
-        <p className="detail__intro"><b>{d.name}</b> ({d.position}) mengajukan <b>{d.type}</b> selama <b>{d.days} hari</b> pada <b>{d.dates}</b>.</p>
+        <p className="detail__intro"><b>{d.name}</b> ({d.position}) is requesting <b>{d.type}</b> for <b>{d.days} day{d.days !== 1 ? 's' : ''}</b> on <b>{d.dates}</b>.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Tipe</span><span className="detail__info-value">{d.type}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal</span><span className="detail__info-value">{d.dates}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Durasi</span><span className="detail__info-value">{d.days} hari</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Sisa Saldo Cuti</span><span className="detail__info-value">{d.balance} hari</span></div>
-          <div className="detail__info-row" style={{ gridColumn: '1 / -1' }}><span className="detail__info-label">Alasan</span><span className="detail__info-value" style={{ fontWeight: 500 }}>{d.reason}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Type</span><span className="detail__info-value">{d.type}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Dates</span><span className="detail__info-value">{d.dates}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Duration</span><span className="detail__info-value">{d.days} day{d.days !== 1 ? 's' : ''}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Remaining Balance</span><span className="detail__info-value">{d.balance} days</span></div>
+          <div className="detail__info-row" style={{ gridColumn: '1 / -1' }}><span className="detail__info-label">Reason</span><span className="detail__info-value" style={{ fontWeight: 500 }}>{d.reason}</span></div>
         </div>
         <div className="detail__primary-cta">
           <button className="btn-primary"><i data-lucide="external-link" />Open in Time Off module</button>
-          <button className="btn-secondary">Lihat riwayat cuti karyawan →</button>
+          <button className="btn-secondary">View employee leave history →</button>
         </div>
       </div>
     )
 
     case 'timeoff-approved': return (
       <div className="detail__body">
-        <p className="detail__intro">Cuti tahunan Anda selama <b>{d.days} hari</b> pada <b>{d.dates}</b> telah <b>disetujui</b>.</p>
+        <p className="detail__intro">Your <b>{d.days}-day annual leave</b> on <b>{d.dates}</b> has been <b>approved</b>.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--success">Disetujui</span></span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Persetujuan</span><span className="detail__info-value">Tony Stark — 23 Mei 2026</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--success">Approved</span></span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Approved by</span><span className="detail__info-value">Tony Stark — 23 May 2026</span></div>
         </div>
         <div className="detail__primary-cta">
-          <button className="btn-primary"><i data-lucide="calendar" />Tambahkan ke kalender</button>
+          <button className="btn-primary"><i data-lucide="calendar" />Add to calendar</button>
         </div>
       </div>
     )
 
     case 'attendance-clockout': return (
       <div className="detail__body">
-        <p className="detail__intro">Anda <b>belum melakukan clock-out</b> pada hari {d.date}. Mohon konfirmasi waktu keluar Anda agar catatan kehadiran tetap akurat.</p>
+        <p className="detail__intro">You <b>did not clock out</b> on {d.date}. Please confirm your departure time to keep attendance records accurate.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal</span><span className="detail__info-value">{d.date}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Date</span><span className="detail__info-value">{d.date}</span></div>
           <div className="detail__info-row"><span className="detail__info-label">Clock-in</span><span className="detail__info-value">{d.clockIn}</span></div>
           <div className="detail__info-row"><span className="detail__info-label">Clock-out</span><span className="detail__info-value" style={{ color: 'var(--color-warning-700)' }}>{d.clockOut}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--warning">Belum lengkap</span></span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--warning">Incomplete</span></span></div>
         </div>
         <div className="detail__primary-cta">
-          <button className="btn-primary"><i data-lucide="log-out" />Konfirmasi clock-out</button>
-          <button className="btn-secondary">Buka halaman Attendance →</button>
+          <button className="btn-primary"><i data-lucide="log-out" />Confirm clock-out</button>
+          <button className="btn-secondary">Open Attendance page →</button>
         </div>
       </div>
     )
 
     case 'changedata-request': return (
       <div className="detail__body">
-        <p className="detail__intro"><b>{d.name}</b> mengajukan perubahan pada <b>{d.field}</b>. Tinjau detail di bawah sebelum menyetujui.</p>
+        <p className="detail__intro"><b>{d.name}</b> has submitted a change request for <b>{d.field}</b>. Review the details below before approving.</p>
         <div className="detail__info-grid">
           <div className="detail__info-row"><span className="detail__info-label">Field</span><span className="detail__info-value">{d.field}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--info">Menunggu</span></span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Sebelum</span><span className="detail__info-value" style={{ color: 'var(--fg-3)', textDecoration: 'line-through' }}>{d.before}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Sesudah</span><span className="detail__info-value" style={{ color: 'var(--color-secondary-700)' }}>{d.after}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--info">Pending</span></span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Before</span><span className="detail__info-value" style={{ color: 'var(--fg-3)', textDecoration: 'line-through' }}>{d.before}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">After</span><span className="detail__info-value" style={{ color: 'var(--color-secondary-700)' }}>{d.after}</span></div>
         </div>
         <div className="detail__primary-cta">
-          <button className="btn-primary"><i data-lucide="external-link" />Tinjau di Employee Directory</button>
+          <button className="btn-primary"><i data-lucide="external-link" />Review in Employee Directory</button>
         </div>
       </div>
     )
 
     case 'changedata-confirm': return (
       <div className="detail__body">
-        <p className="detail__intro">Email pada profil Anda telah berhasil diperbarui. Email baru kini menjadi identitas Anda di SEVAKA.</p>
+        <p className="detail__intro">The email on your profile has been successfully updated. Your new email is now your identity on SEVAKA.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--success">Diperbarui</span></span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--success">Updated</span></span></div>
           <div className="detail__info-row"><span className="detail__info-label">Field</span><span className="detail__info-value">Email</span></div>
         </div>
       </div>
@@ -247,26 +249,26 @@ function DetailBody({ m }: { m: Message }) {
 
     case 'reimburse-approved': return (
       <div className="detail__body">
-        <p className="detail__intro">Reimbursement Anda untuk kategori <b>{d.category}</b> sebesar <b>{d.amount}</b> telah <b>disetujui</b> dan akan dibayarkan pada {d.payoutDate}.</p>
+        <p className="detail__intro">Your reimbursement for <b>{d.category}</b> of <b>{d.amount}</b> has been <b>approved</b> and will be paid on {d.payoutDate}.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Kategori</span><span className="detail__info-value">{d.category}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Jumlah</span><span className="detail__info-value">{d.amount}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--success">Disetujui</span></span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal Cair</span><span className="detail__info-value">{d.payoutDate}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Category</span><span className="detail__info-value">{d.category}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Amount</span><span className="detail__info-value">{d.amount}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--success">Approved</span></span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Payout Date</span><span className="detail__info-value">{d.payoutDate}</span></div>
         </div>
       </div>
     )
 
     case 'overtime-request': return (
       <div className="detail__body">
-        <p className="detail__intro"><b>{d.name}</b> mengajukan lembur <b>{d.hours} jam</b> pada <b>{d.date}</b> untuk proyek <b>{d.project}</b>.</p>
+        <p className="detail__intro"><b>{d.name}</b> is requesting <b>{d.hours} hours of overtime</b> on <b>{d.date}</b> for the <b>{d.project}</b> project.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal</span><span className="detail__info-value">{d.date}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Durasi</span><span className="detail__info-value">{d.hours} jam</span></div>
-          <div className="detail__info-row" style={{ gridColumn: '1 / -1' }}><span className="detail__info-label">Proyek</span><span className="detail__info-value">{d.project}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Date</span><span className="detail__info-value">{d.date}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Duration</span><span className="detail__info-value">{d.hours} hours</span></div>
+          <div className="detail__info-row" style={{ gridColumn: '1 / -1' }}><span className="detail__info-label">Project</span><span className="detail__info-value">{d.project}</span></div>
         </div>
         <div className="detail__primary-cta">
-          <button className="btn-primary"><i data-lucide="external-link" />Tinjau di modul Overtime</button>
+          <button className="btn-primary"><i data-lucide="external-link" />Review in Overtime module</button>
         </div>
       </div>
     )
@@ -276,35 +278,35 @@ function DetailBody({ m }: { m: Message }) {
         <h3 style={{ font: '700 18px/1.3 var(--font-display)', margin: 0, color: 'var(--fg-1)', letterSpacing: '-0.01em' }}>{d.headline}</h3>
         <p style={{ font: '400 14px/1.7 var(--font-body)', color: 'var(--fg-2)', margin: 0 }}>{d.body}</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Penerbit</span><span className="detail__info-value">{m.source}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal</span><span className="detail__info-value">{m.date}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Publisher</span><span className="detail__info-value">{m.source}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Date</span><span className="detail__info-value">{m.date}</span></div>
         </div>
       </div>
     )
 
     case 'mpp-update': return (
       <div className="detail__body">
-        <p className="detail__intro"><b>Manpower Plan Q3 2026</b> telah diperbarui. Alokasi untuk divisi <b>Engineering</b> meningkat sebesar 12% dibandingkan kuartal sebelumnya.</p>
+        <p className="detail__intro"><b>Manpower Plan Q3 2026</b> has been updated. Allocation for the <b>Engineering</b> division increased by 12% compared to the previous quarter.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Periode</span><span className="detail__info-value">Q3 2026</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Divisi Terdampak</span><span className="detail__info-value">Engineering, Product</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Period</span><span className="detail__info-value">Q3 2026</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Affected Divisions</span><span className="detail__info-value">Engineering, Product</span></div>
           <div className="detail__info-row"><span className="detail__info-label">Δ Headcount</span><span className="detail__info-value" style={{ color: 'var(--color-success-700)' }}>+12%</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--info">Tinjauan</span></span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Status</span><span className="detail__info-value"><span className="detail__status status--info">Under Review</span></span></div>
         </div>
         <div className="detail__primary-cta">
-          <button className="btn-primary"><i data-lucide="external-link" />Buka MPP Dashboard</button>
+          <button className="btn-primary"><i data-lucide="external-link" />Open MPP Dashboard</button>
         </div>
       </div>
     )
 
     case 'transfer-notice': return (
       <div className="detail__body">
-        <p className="detail__intro"><b>{d.name}</b> akan dimutasi dari <b>{d.from}</b> ke <b>{d.to}</b> efektif <b>{d.effective}</b>.</p>
+        <p className="detail__intro"><b>{d.name}</b> has been transferred from <b>{d.from}</b> to <b>{d.to}</b>, effective <b>{d.effective}</b>.</p>
         <div className="detail__info-grid">
-          <div className="detail__info-row"><span className="detail__info-label">Karyawan</span><span className="detail__info-value">{d.name}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Tanggal Efektif</span><span className="detail__info-value">{d.effective}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Dari</span><span className="detail__info-value">{d.from}</span></div>
-          <div className="detail__info-row"><span className="detail__info-label">Ke</span><span className="detail__info-value" style={{ color: 'var(--color-secondary-700)' }}>{d.to}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Employee</span><span className="detail__info-value">{d.name}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">Effective Date</span><span className="detail__info-value">{d.effective}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">From</span><span className="detail__info-value">{d.from}</span></div>
+          <div className="detail__info-row"><span className="detail__info-label">To</span><span className="detail__info-value" style={{ color: 'var(--color-secondary-700)' }}>{d.to}</span></div>
         </div>
       </div>
     )
@@ -371,7 +373,6 @@ export default function Inbox({ onDashboardNavigate }: InboxProps) {
     if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': '1.75' } })
   })
 
-  // Filtering
   function filtered() {
     return messages.filter(m => {
       if (activeCat === 'approvals') return isApproval(m)
@@ -384,7 +385,6 @@ export default function Inbox({ onDashboardNavigate }: InboxProps) {
     })
   }
 
-  // Counts per category
   function unreadCount(cat: string) {
     if (cat === 'all') return messages.filter(m => m.unread).length
     if (cat === 'approvals') return messages.filter(m => m.unread && isApproval(m)).length
@@ -433,25 +433,22 @@ export default function Inbox({ onDashboardNavigate }: InboxProps) {
 
   return (
     <div className="app__scroll inbox-scroll" ref={containerRef}>
+      <section className="inbox-box">
+
       {/* Page header */}
       <header className="inbox-page-head">
-        <div className="inbox-crumbs">
-          <a href="#" onClick={e => { e.preventDefault(); onDashboardNavigate?.() }}>
-            <i data-lucide="home" /> Dashboard
-          </a>
-          <i data-lucide="chevron-right" className="inbox-crumbs__sep" />
-          <span>Inbox</span>
+        <div className="inbox-page-head__copy">
+          <nav className="inbox-page-head__crumb">
+            <a href="#" onClick={e => { e.preventDefault(); onDashboardNavigate?.() }}>Dashboard</a>
+            <span className="inbox-page-head__crumb-sep">/</span>
+            <span className="inbox-page-head__crumb-current">Notifications</span>
+          </nav>
+          <h1 className="inbox-page-head__title">Inbox</h1>
         </div>
-        <div className="inbox-page-head__row">
-          <div className="inbox-page-head__copy">
-            <h1 className="inbox-page-head__title">Inbox</h1>
-            <p className="inbox-page-head__sub">Semua notifikasi sistem dan pesan persetujuan Anda — dikategorikan agar mudah ditelusuri.</p>
-          </div>
-          <div className="inbox-page-head__actions">
-            <button className="btn-ghost" onClick={markAllRead}><i data-lucide="check-check" />Mark all as read</button>
-            <button className="btn-ghost"><i data-lucide="clipboard-list" />Approval list</button>
-            <button className="btn-primary"><i data-lucide="settings-2" />Preferences</button>
-          </div>
+        <div className="inbox-page-head__actions">
+          <button className="btn-ghost" onClick={markAllRead}><i data-lucide="check-check" />Mark all as read</button>
+          <button className="btn-ghost"><i data-lucide="clipboard-list" />Approval list</button>
+          <button className="btn-primary"><i data-lucide="settings-2" />Preferences</button>
         </div>
       </header>
 
@@ -474,7 +471,7 @@ export default function Inbox({ onDashboardNavigate }: InboxProps) {
                     key={c.id}
                     className={`cat${activeCat === c.id ? ' is-on' : ''}`}
                     data-cat={c.id}
-                    onClick={() => { setActiveCat(c.id); if (selectedId !== null && !filtered().find(m => m.id === selectedId)) setSelectedId(null) }}
+                    onClick={() => setActiveCat(c.id)}
                   >
                     <span className="cat__icon"><i data-lucide={c.icon} /></span>
                     <span className="cat__label">{c.label}</span>
@@ -521,7 +518,7 @@ export default function Inbox({ onDashboardNavigate }: InboxProps) {
               <li className="inbox-list__empty">
                 <div className="inbox-list__empty-icon"><i data-lucide="inbox" /></div>
                 <div className="inbox-list__empty-title">No messages here</div>
-                <p className="inbox-list__empty-sub">Belum ada pesan pada kategori ini. Notifikasi baru akan muncul di sini secara otomatis.</p>
+                <p className="inbox-list__empty-sub">No messages in this category yet. New notifications will appear here automatically.</p>
               </li>
             ) : items.map(m => {
               const meta = CAT_META[m.cat] ?? {}
@@ -570,6 +567,8 @@ export default function Inbox({ onDashboardNavigate }: InboxProps) {
             <DetailEmpty />
           )}
         </section>
+      </section>
+
       </section>
     </div>
   )

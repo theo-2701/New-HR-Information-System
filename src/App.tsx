@@ -3,21 +3,46 @@ import Topnav from './components/Topnav'
 import Sidebar from './components/Sidebar'
 import Dashboard from './components/screens/Dashboard'
 import Employee from './components/screens/Employee'
+import AddEmployee from './components/screens/AddEmployee'
 import Profile from './components/screens/Profile'
 import TimeManagement from './components/screens/TimeManagement'
 import Inbox from './components/screens/Inbox'
+import SignIn from './components/screens/SignIn'
 
-type Screen = 'dashboard' | 'employee' | 'profile' | 'time' | 'inbox' | 'signin'
+type Screen = 'dashboard' | 'employee' | 'add-employee' | 'profile' | 'time' | 'inbox' | 'signin'
 
-const SCREENS: Screen[] = ['dashboard', 'employee', 'profile', 'time', 'inbox']
+const SCREENS: Screen[] = ['dashboard', 'employee', 'add-employee', 'profile', 'time', 'inbox']
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('dashboard')
+  const [screen, setScreen] = useState<Screen>('signin')
 
   const goTo = (name: string) => {
     const target = SCREENS.includes(name as Screen) ? (name as Screen) : 'dashboard'
     setScreen(target)
     window.scrollTo(0, 0)
+  }
+
+  if (screen === 'signin') {
+    return <SignIn onLogin={() => setScreen('dashboard')} />
+  }
+
+  /* Add Employee gets the full main area (own layout, no shell wrapper) */
+  if (screen === 'add-employee') {
+    return (
+      <div className="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Topnav bellActive={false} onInboxNavigate={() => goTo('inbox')} />
+        <div className="app__body">
+          <Sidebar
+            dashboardActive={false}
+            onDashboardClick={() => goTo('dashboard')}
+            onNavItemClick={(group, item) => {
+              if (group === 'employees' && item === 'Employee Directory') goTo('employee')
+            }}
+          />
+          <AddEmployee goTo={goTo} />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -30,6 +55,9 @@ export default function App() {
         <Sidebar
           dashboardActive={screen === 'dashboard'}
           onDashboardClick={() => goTo('dashboard')}
+          onNavItemClick={(group, item) => {
+            if (group === 'employees' && item === 'Employee Directory') goTo('employee')
+          }}
         />
         <main className="app__main">
           {screen === 'inbox' ? (

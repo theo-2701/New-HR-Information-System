@@ -23,51 +23,57 @@
 }
 
 /* ============================================================
+   Inbox box — outer white card wrapping header + 3 panes
+   ============================================================ */
+.inbox-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ============================================================
    Page header
    ============================================================ */
 .inbox-page-head {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--border-2);
 }
-.inbox-crumbs {
+.inbox-page-head__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.inbox-page-head__crumb {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font: 500 12px/1 var(--font-body);
-  color: var(--fg-3);
+  font: 700 10px/1.4 var(--font-body);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
-.inbox-crumbs a {
-  color: var(--fg-3);
+.inbox-page-head__crumb a {
+  color: var(--color-secondary-500);
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   transition: color var(--duration-2) var(--ease-standard);
 }
-.inbox-crumbs a:hover { color: var(--color-secondary-500); }
-.inbox-crumbs a svg { width: 14px; height: 14px; }
-.inbox-crumbs__sep { width: 12px; height: 12px; color: var(--fg-4); }
-.inbox-crumbs span { color: var(--fg-1); font-weight: 600; }
-
-.inbox-page-head__row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-}
-.inbox-page-head__copy { max-width: 640px; }
+.inbox-page-head__crumb a:hover { color: var(--color-secondary-700); }
+.inbox-page-head__crumb-sep { color: var(--color-silver); }
+.inbox-page-head__crumb-current { color: var(--color-secondary-500); }
 .inbox-page-head__title {
   margin: 0;
-  font: 700 36px/1.1 var(--font-display);
-  letter-spacing: -0.025em;
-  color: var(--fg-1);
-}
-.inbox-page-head__sub {
-  margin: 6px 0 0;
-  font: 400 14px/1.5 var(--font-body);
-  color: var(--fg-3);
-  max-width: 540px;
+  font: 700 20px/1.25 var(--font-display);
+  letter-spacing: -0.01em;
+  color: var(--color-obsidian);
 }
 .inbox-page-head__actions {
   display: flex;
@@ -123,14 +129,13 @@
   align-items: stretch;
 }
 
-/* Each pane is a card */
+/* Each pane is a region inside the box — flattened, no separate shadow */
 .inbox-cats,
 .inbox-list-col,
 .inbox-detail {
   background: var(--bg-surface);
   border: 1px solid var(--border-1);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card-sm);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -242,7 +247,6 @@
   background: var(--color-primary-100);
   color: var(--color-secondary-700);
   font-weight: 700;
-  box-shadow: inset 3px 0 0 var(--color-secondary-500);
 }
 .cat.is-on .cat__icon { color: var(--color-secondary-500); }
 

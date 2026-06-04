@@ -1,0 +1,591 @@
+/* ===== SEVAKA HRIS — Employee Modals =====
+   Modal primitives + all employee-directory-specific modal styles.
+   Imported after employee.css. */
+
+/* ================================================================
+   MODAL PRIMITIVES (scrim, shell, close, title, rule, foot)
+   ================================================================ */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-scrim);
+  backdrop-filter: var(--blur-scrim);
+  -webkit-backdrop-filter: var(--blur-scrim);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 200;
+}
+.modal-scrim.is-open { display: flex; animation: scrimIn var(--duration-2) var(--ease-standard); }
+@keyframes scrimIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.modal {
+  position: relative;
+  background: #fff;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-popup);
+  animation: modalIn var(--duration-3) var(--ease-emphasized);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal__close {
+  position: absolute;
+  top: 22px; right: 26px;
+  width: 28px; height: 28px;
+  border: none; background: transparent;
+  color: var(--fg-4); cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--duration-2) var(--ease-standard), color var(--duration-2) var(--ease-standard);
+}
+.modal__close:hover { background: var(--color-mist); color: var(--fg-2); }
+.modal__close svg { width: 22px; height: 22px; }
+
+.modal__title {
+  font: 700 26px/1.2 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+  margin: 0;
+  padding-right: 36px;
+}
+.modal__rule { height: 1px; background: var(--border-1); margin: 20px 0; }
+.modal__body { font: 500 16px/1.5 var(--font-body); color: var(--fg-2); margin: 0; }
+.modal__foot { display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px; }
+
+/* ================================================================
+   FORM PRIMITIVES (ae-grid, fld, ctl, dropdown, mini-check)
+   ================================================================ */
+.ae-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+}
+.ae-grid .span-2 { grid-column: 1 / -1; }
+
+.fld { display: flex; flex-direction: column; gap: 8px; }
+.fld__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 700 15px/1.2 var(--font-body);
+  color: var(--fg-1);
+}
+.fld__label .req { color: var(--color-error-500); font-weight: 700; }
+.fld__help { font: 700 12px/1.4 var(--font-body); color: var(--fg-1); }
+
+.ctl {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-cloud);
+  box-shadow: var(--shadow-inset-rim);
+  transition: box-shadow var(--duration-2) var(--ease-standard);
+}
+.ctl > input,
+.ctl > textarea {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0 14px;
+  font: 500 15px/1 var(--font-body);
+  color: var(--fg-1);
+}
+.ctl > input::placeholder,
+.ctl > textarea::placeholder { color: var(--fg-4); font-weight: 400; }
+.ctl:focus-within { box-shadow: inset 0 0 0 1px var(--color-secondary-500), 0 0 0 4px rgba(2,132,199,.16); }
+.ctl--area { height: auto; align-items: stretch; }
+.ctl--area > textarea {
+  height: auto;
+  min-height: 120px;
+  padding: 12px 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.ctl--select { cursor: pointer; }
+.ctl__value {
+  flex: 1;
+  padding: 0 14px;
+  font: 500 15px/1 var(--font-body);
+  color: var(--fg-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ctl__value.has-value { color: var(--fg-1); }
+.ctl__chev {
+  width: 20px; height: 20px;
+  margin-right: 12px;
+  color: var(--fg-3);
+  flex-shrink: 0;
+  transition: transform var(--duration-2) var(--ease-standard);
+}
+.ctl--select.is-open .ctl__chev { transform: rotate(180deg); }
+.ctl__icon {
+  width: 20px; height: 20px;
+  margin-right: 12px;
+  color: var(--fg-3);
+  flex-shrink: 0;
+}
+.ctl--date { cursor: pointer; }
+.ctl--date > input { cursor: pointer; pointer-events: none; }
+.ctl.is-disabled {
+  background: var(--color-vapor);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.ctl.is-disabled .ctl__value,
+.ctl.is-disabled > input { color: var(--fg-4); }
+
+/* Dropdown popover */
+.dropdown {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+  padding: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: none;
+}
+.ctl--select.is-open .dropdown { display: block; }
+.dropdown__opt {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font: 500 14px/1.2 var(--font-body);
+  color: var(--fg-1);
+  cursor: pointer;
+}
+.dropdown__opt:hover { background: var(--color-mist); }
+.dropdown__opt.is-sel { background: var(--color-secondary-100); color: var(--color-secondary-700); font-weight: 600; }
+
+/* Mini checkbox */
+.mini-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font: 600 12px/1 var(--font-body);
+  color: var(--fg-2);
+  user-select: none;
+}
+.mini-check input { position: absolute; opacity: 0; pointer-events: none; }
+.mini-check__box {
+  width: 18px; height: 18px; border-radius: 4px; background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--color-error-500);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--duration-2) var(--ease-standard), box-shadow var(--duration-2) var(--ease-standard);
+}
+.mini-check input:checked + .mini-check__box { background: var(--color-secondary-500); box-shadow: none; }
+.mini-check input:checked + .mini-check__box::after {
+  content: ""; width: 9px; height: 5px; border: 2px solid #fff; border-top: none; border-right: none;
+  transform: rotate(-45deg); margin-top: -2px;
+}
+
+/* ================================================================
+   SHEET MODAL SHELL (Transfer, Filter, Import)
+   ================================================================ */
+.modal--sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  padding: 0;
+  overflow: hidden;
+}
+.modal__head {
+  flex-shrink: 0;
+  padding: 24px 32px 18px;
+  border-bottom: 1px solid var(--border-1);
+}
+.modal__head .modal__title { padding-right: 40px; }
+.modal__scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-2) transparent;
+}
+.modal__scroll::-webkit-scrollbar { width: 10px; }
+.modal__scroll::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 6px; border: 2px solid #fff; }
+.sheet-foot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 32px;
+  border-top: 1px solid var(--border-1);
+  background: #fff;
+}
+.sheet-foot__spacer { flex: 1; }
+.sheet-foot .btn { min-width: 132px; min-height: 44px; max-height: 44px; font-size: 15px; }
+.sheet-foot__link {
+  font: 700 15px/1 var(--font-body);
+  color: var(--color-secondary-600);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.sheet-foot__link:hover { color: var(--color-secondary-800); }
+
+/* ================================================================
+   EMPLOYEE TRANSFER MODAL
+   ================================================================ */
+.modal--transfer { width: 1000px; max-width: 95vw; }
+
+.tr-section-head { margin: 4px 0 22px; }
+.tr-section-head__title { font: 700 18px/1.2 var(--font-body); color: var(--fg-1); }
+.tr-section-head__sub { font: 500 14px/1.4 var(--font-body); color: var(--fg-3); margin-top: 4px; }
+.tr-divider { height: 1px; background: var(--border-1); margin: 30px 0; }
+
+.tr-help { font: 700 12px/1.5 var(--font-body); color: var(--fg-2); }
+.tr-help a { color: var(--color-secondary-600); text-decoration: underline; }
+.tr-help a:hover { color: var(--color-secondary-800); }
+
+.tr-multi { grid-column: 1 / -1; display: flex; flex-direction: column; }
+.tr-multi__label { margin-bottom: 8px; }
+.tr-multi__list { display: flex; flex-direction: column; gap: 16px; }
+.tr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+.tr-row__cell { display: flex; align-items: center; gap: 12px; }
+.tr-row__cell .ctl { flex: 1; min-width: 0; }
+
+.x-remove {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  border: none; background: transparent;
+  color: var(--color-error-500);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: var(--radius-sm);
+  transition: background var(--duration-2) var(--ease-standard);
+}
+.x-remove:hover { background: var(--color-error-50); }
+.x-remove svg { width: 16px; height: 16px; }
+
+.file-ctl {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-cloud);
+  box-shadow: var(--shadow-inset-rim);
+  overflow: hidden;
+}
+.file-ctl__btn {
+  height: 100%;
+  padding: 0 16px;
+  display: inline-flex; align-items: center;
+  background: var(--color-secondary-50);
+  color: var(--color-secondary-700);
+  border: none;
+  border-right: 1px solid var(--border-1);
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--duration-2) var(--ease-standard);
+}
+.file-ctl__btn:hover { background: var(--color-secondary-100); }
+.file-ctl__name { padding: 0 14px; font: 500 14px/1 var(--font-body); color: var(--fg-4); }
+
+.tr-doc { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: stretch; }
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--color-secondary-200);
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--color-silver);
+  font: 700 14px/1 var(--font-body);
+  cursor: not-allowed;
+}
+.btn-outline svg { width: 18px; height: 18px; }
+
+.tr-notify { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+
+/* ================================================================
+   ALL FILTER MODAL
+   ================================================================ */
+.modal--filter { width: 660px; max-width: 95vw; }
+.modal--filter .modal__scroll { padding: 8px 32px 16px; }
+
+/* Empty state */
+.filter-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 0 64px;
+}
+.filter-empty__icon { color: var(--color-secondary-600); margin-bottom: 24px; }
+.filter-empty__icon svg { width: 56px; height: 56px; stroke-width: 1.6; }
+.filter-empty__title { font: 700 22px/1.2 var(--font-display); letter-spacing: -0.01em; color: var(--fg-1); }
+.filter-empty__sub { font: 500 15px/1.4 var(--font-body); color: var(--fg-3); margin: 6px 0 24px; }
+
+/* Add filter button */
+.filter-addwrap { position: relative; display: inline-block; }
+.add-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 22px;
+  border: 1px solid var(--color-secondary-200);
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--color-secondary-700);
+  font: 700 15px/1 var(--font-body);
+  cursor: pointer;
+  transition: background var(--duration-2) var(--ease-standard), border-color var(--duration-2) var(--ease-standard);
+}
+.add-filter:hover { background: var(--color-secondary-50); border-color: var(--color-secondary-500); }
+.add-filter svg { width: 20px; height: 20px; }
+
+/* LOV popover — rendered at body level via portal, never clipped */
+.lov-menu {
+  position: fixed;
+  z-index: 2000;
+  width: 288px;
+  padding: 8px;
+  background: var(--color-white);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+}
+.lov-menu__search {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-cloud);
+  box-shadow: var(--shadow-inset-rim);
+  margin-bottom: 8px;
+}
+.lov-menu__search svg { width: 18px; height: 18px; color: var(--fg-3); margin: 0 8px 0 12px; flex-shrink: 0; }
+.lov-menu__search input {
+  flex: 1; min-width: 0;
+  border: none; background: transparent; outline: none;
+  padding: 0 12px 0 0;
+  font: 500 14px/1 var(--font-body); color: var(--fg-1);
+}
+.lov-menu__search input::placeholder { color: var(--fg-4); }
+.lov-menu__list { display: flex; flex-direction: column; max-height: 252px; overflow-y: auto; }
+.lov-menu__item {
+  text-align: left;
+  border: none; background: transparent;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font: 600 14px/1.2 var(--font-body); color: var(--fg-1);
+  cursor: pointer;
+  transition: background var(--duration-2) var(--ease-standard);
+}
+.lov-menu__item:hover { background: var(--color-secondary-50); color: var(--color-secondary-700); }
+.lov-menu__noresult,
+.lov-menu__empty {
+  padding: 14px 12px;
+  text-align: center;
+  font: 500 13px/1.4 var(--font-body); color: var(--fg-3);
+}
+
+/* Filter blocks list */
+.filter-list { display: flex; flex-direction: column; }
+.filter-block { padding: 22px 0; border-bottom: 1px solid var(--border-1); }
+.filter-block__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.filter-block__title { flex: 1; font: 700 22px/1.2 var(--font-display); letter-spacing: -0.01em; color: var(--fg-1); }
+.filter-block__sub { font: 500 14px/1.4 var(--font-body); color: var(--fg-3); margin: 4px 0 14px; }
+.filter-block__sub.is-collapsed-state { margin-bottom: 4px; }
+.filter-block__selected { }
+.filter-block__selected.has-sel { color: var(--color-secondary-700); font-weight: 600; }
+/* Red borderless delete */
+.filter-block__remove {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  border: none; background: transparent;
+  color: var(--color-error-500);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: var(--radius-sm);
+  transition: background var(--duration-2) var(--ease-standard);
+}
+.filter-block__remove:hover { background: var(--color-error-50); }
+.filter-block__remove svg { width: 20px; height: 20px; }
+/* Collapse chevron — up when expanded, down when collapsed */
+.filter-block__chev {
+  width: 30px; height: 30px;
+  border: none; background: transparent;
+  color: var(--fg-3);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: var(--radius-sm);
+  transform: rotate(180deg);
+  transition: transform var(--duration-2) var(--ease-standard), background var(--duration-2) var(--ease-standard);
+}
+.filter-block__chev:hover { background: var(--color-mist); }
+.filter-block__chev svg { width: 20px; height: 20px; }
+.filter-block.is-collapsed .filter-block__chev { transform: rotate(0deg); }
+.filter-block.is-collapsed .filter-block__body { display: none; }
+
+/* Search inside a filter block */
+.filter-search {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-cloud);
+  box-shadow: var(--shadow-inset-rim);
+  margin-bottom: 14px;
+}
+.filter-search input {
+  flex: 1; min-width: 0;
+  border: none; background: transparent; outline: none;
+  padding: 0 14px;
+  font: 500 15px/1 var(--font-body); color: var(--fg-1);
+}
+.filter-search input::placeholder { color: var(--fg-4); }
+.filter-search svg { width: 20px; height: 20px; color: var(--fg-3); margin-right: 14px; flex-shrink: 0; }
+
+/* Scrollable option list (~5 rows visible, "Select all" scrolls with it) */
+.filter-opts {
+  display: flex; flex-direction: column; gap: 12px;
+  max-height: 168px; overflow-y: auto;
+  padding: 2px 2px 2px 0;
+}
+.filter-opt__txt { line-height: 1.3; }
+.filter-opt--all { font-weight: 600; }
+.filter-noresult {
+  padding: 14px 0 4px;
+  font: 500 13px/1.4 var(--font-body); color: var(--fg-3);
+}
+.filter-add-row { margin-top: 22px; }
+
+/* Red checkbox variant */
+.check-red {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font: 500 15px/1 var(--font-body);
+  color: var(--fg-1);
+  user-select: none;
+  position: relative;
+}
+.check-red input { position: absolute; opacity: 0; pointer-events: none; }
+.check-red__box {
+  width: 20px; height: 20px; border-radius: 5px; background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--color-silver);
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--duration-2) var(--ease-standard), box-shadow var(--duration-2) var(--ease-standard);
+}
+.check-red input:checked + .check-red__box { background: var(--color-error-500); box-shadow: none; }
+.check-red input:checked + .check-red__box::after {
+  content: ""; width: 10px; height: 6px; border: 2px solid #fff; border-top: none; border-right: none;
+  transform: rotate(-45deg); margin-top: -2px;
+}
+
+/* ================================================================
+   IMPORT EMPLOYEE MODAL
+   ================================================================ */
+.modal--import { width: 600px; max-width: 95vw; }
+.import-step__title { font: 700 22px/1.25 var(--font-display); letter-spacing: -0.01em; color: var(--fg-1); }
+.import-step__sub { font: 500 15px/1.5 var(--font-body); color: var(--fg-2); margin: 8px 0 22px; }
+.import-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--color-vapor);
+  border-radius: var(--radius-md);
+  margin-bottom: 26px;
+}
+.import-file__icon { color: var(--fg-3); display: inline-flex; }
+.import-file__icon svg { width: 22px; height: 22px; }
+.import-file__name { flex: 1; font: 500 15px/1.3 var(--font-body); color: var(--fg-1); }
+.import-file__dl {
+  width: 34px; height: 34px;
+  border: none; background: transparent;
+  color: var(--fg-3); cursor: pointer; border-radius: var(--radius-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--duration-2) var(--ease-standard), color var(--duration-2) var(--ease-standard);
+}
+.import-file__dl:hover { background: #fff; color: var(--color-secondary-600); }
+.import-file__dl svg { width: 22px; height: 22px; }
+.import-tips__title { font: 700 19px/1.25 var(--font-display); letter-spacing: -0.01em; color: var(--fg-1); margin-bottom: 12px; }
+.import-tips__list { margin: 0 0 26px; padding-left: 20px; }
+.import-tips__list li { font: 500 15px/1.7 var(--font-body); color: var(--fg-2); }
+.import-tips__list li::marker { color: var(--fg-3); }
+.import-upload-label { font: 700 15px/1.2 var(--font-body); color: var(--fg-1); margin-bottom: 10px; }
+.modal--import .file-ctl { height: 52px; }
+
+/* ================================================================
+   CONFIRMATION MODALS (Resign / Delete) — modal--ask variant
+   ================================================================ */
+.modal--ask { width: 540px; padding: 28px 32px; }
+.modal--ask .modal__body { white-space: pre-line; }
+.modal--ask .modal__foot { margin-top: 28px; }
+.modal--ask .modal__foot .btn { min-height: 48px; max-height: 48px; padding: 0 26px; font-size: 16px; }
+
+.ask-note {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 18px;
+  margin-top: 20px;
+  background: var(--color-secondary-50);
+  border-radius: var(--radius-md);
+  font: 500 15px/1.5 var(--font-body);
+  color: var(--fg-2);
+}
+.ask-note__icon { flex-shrink: 0; color: var(--color-tertiary-700); display: inline-flex; }
+.ask-note__icon svg { width: 26px; height: 26px; }
+
+/* ================================================================
+   SUCCESS MODAL
+   ================================================================ */
+.modal--success {
+  width: 468px;
+  padding: 52px 48px 44px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.success__icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--color-secondary-100);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+  color: var(--color-secondary-600);
+}
+.success__icon svg { width: 40px; height: 40px; }
+.success__title {
+  font: 700 28px/1.2 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--color-secondary-700);
+  margin: 24px 0 0;
+}
+.success__desc {
+  font: 500 15px/1.65 var(--font-body);
+  color: var(--fg-3);
+  margin: 14px 0 0;
+  max-width: 340px;
+}
+.success__cta { margin-top: 36px; min-width: 240px; }

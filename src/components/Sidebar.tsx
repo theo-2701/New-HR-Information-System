@@ -16,9 +16,10 @@ const NAV = [
 interface SidebarProps {
   dashboardActive?: boolean
   onDashboardClick?: () => void
+  onNavItemClick?: (group: string, item: string) => void
 }
 
-export default function Sidebar({ dashboardActive = false, onDashboardClick }: SidebarProps) {
+export default function Sidebar({ dashboardActive = false, onDashboardClick, onNavItemClick }: SidebarProps) {
   const [expanded, setExpanded] = useState(() => {
     try { return localStorage.getItem('sidebarExpanded') === 'true' } catch { return false }
   })
@@ -61,8 +62,9 @@ export default function Sidebar({ dashboardActive = false, onDashboardClick }: S
     }
   }
 
-  function handleItemClick(item: string) {
+  function handleItemClick(group: string, item: string) {
     setActiveItem(item)
+    if (onNavItemClick) onNavItemClick(group, item)
   }
 
   function handleDashboardClick() {
@@ -114,7 +116,7 @@ export default function Sidebar({ dashboardActive = false, onDashboardClick }: S
                     <button
                       key={item}
                       className={`sidebar__submenu-item${activeItem === item ? ' is-on' : ''}`}
-                      onClick={e => { e.stopPropagation(); handleItemClick(item) }}
+                      onClick={e => { e.stopPropagation(); handleItemClick(g.group, item) }}
                     >
                       {item}
                     </button>

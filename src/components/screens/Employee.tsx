@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import DatePickerCtl from '../DatePickerCtl'
 
 /* ── Static data ────────────────────────────────────────────────── */
 const TABS = [
@@ -78,6 +79,8 @@ export default function Employee({ goTo: _goTo }: EmployeeProps) {
 
   /* Other modals */
   const [transferOpen, setTransferOpen] = useState(false)
+  const [notifyManager, setNotifyManager] = useState(false)
+  const [notifyEmployee, setNotifyEmployee] = useState(false)
   const [resignOpen, setResignOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
@@ -641,10 +644,7 @@ export default function Employee({ goTo: _goTo }: EmployeeProps) {
               </div>
               <div className="fld">
                 <label className="fld__label">Effective date <span className="req">*</span></label>
-                <div className="ctl ctl--date">
-                  <input type="text" placeholder="Select Date" readOnly />
-                  <svg className="ctl__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </div>
+                <DatePickerCtl placeholder="Select Date" />
               </div>
               <div className="fld">
                 <label className="fld__label">Transfer type <span className="req">*</span></label>
@@ -735,8 +735,16 @@ export default function Employee({ goTo: _goTo }: EmployeeProps) {
                 <div className="ctl ctl--area"><textarea placeholder="Input here"></textarea></div>
               </div>
               <div className="tr-notify">
-                <label className="mini-check"><input type="checkbox" /><span className="mini-check__box"></span>Notify employee's manager by email</label>
-                <label className="mini-check"><input type="checkbox" /><span className="mini-check__box"></span>Notify employee by email</label>
+                <label className="mini-check">
+                  <input type="checkbox" tabIndex={-1} checked={notifyManager} onChange={e => setNotifyManager(e.target.checked)} />
+                  <span className="mini-check__box"></span>
+                  Notify employee's manager by email
+                </label>
+                <label className="mini-check">
+                  <input type="checkbox" tabIndex={-1} checked={notifyEmployee} onChange={e => setNotifyEmployee(e.target.checked)} />
+                  <span className="mini-check__box"></span>
+                  Notify employee by email
+                </label>
               </div>
             </div>
           </div>

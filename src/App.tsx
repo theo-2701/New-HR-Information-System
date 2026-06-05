@@ -7,11 +7,12 @@ import AddEmployee from './components/screens/AddEmployee'
 import Profile from './components/screens/Profile'
 import TimeManagement from './components/screens/TimeManagement'
 import Inbox from './components/screens/Inbox'
+import Payroll from './components/screens/Payroll'
 import SignIn from './components/screens/SignIn'
 
-type Screen = 'dashboard' | 'employee' | 'add-employee' | 'profile' | 'time' | 'inbox' | 'signin'
+type Screen = 'dashboard' | 'employee' | 'add-employee' | 'profile' | 'time' | 'inbox' | 'payroll' | 'signin'
 
-const SCREENS: Screen[] = ['dashboard', 'employee', 'add-employee', 'profile', 'time', 'inbox']
+const SCREENS: Screen[] = ['dashboard', 'employee', 'add-employee', 'profile', 'time', 'inbox', 'payroll']
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('signin')
@@ -37,6 +38,7 @@ export default function App() {
             onDashboardClick={() => goTo('dashboard')}
             onNavItemClick={(group, item) => {
               if (group === 'employees' && item === 'Employee Directory') goTo('employee')
+              if (group === 'payroll') goTo('payroll')
             }}
           />
           <AddEmployee goTo={goTo} />
@@ -57,6 +59,7 @@ export default function App() {
           onDashboardClick={() => goTo('dashboard')}
           onNavItemClick={(group, item) => {
             if (group === 'employees' && item === 'Employee Directory') goTo('employee')
+            if (group === 'payroll') goTo('payroll')
           }}
         />
         <main className="app__main">
@@ -66,6 +69,7 @@ export default function App() {
             <div className="app__scroll">
               {screen === 'dashboard' && <Dashboard goTo={goTo} />}
               {screen === 'employee'  && <Employee goTo={goTo} />}
+              {screen === 'payroll'   && <Payroll goTo={goTo} />}
               {screen === 'profile'   && <Profile />}
               {screen === 'time'      && <TimeManagement />}
             </div>
